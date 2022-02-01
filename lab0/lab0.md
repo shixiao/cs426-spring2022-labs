@@ -5,9 +5,9 @@ The goal of this lab is to familiarize you with the Go programming language, mul
 
 ## Logistics
 **Policies**
-- Lab 0 is meant to be an **individual** assignment. Please see the [Collaboration Policy](../collaboration_policy.md) for details.
+- Lab 0 is meant to be an **individual** assignment. Please see the [Collaboration Policy](#collaboration-policy) for details.
 - We will help you strategize how to debug but WE WILL NOT DEBUG YOUR CODE FOR YOU.
-- Please keep and submit a time log of time spent and major challenges you've encountered. This may be familiar to you if you've taken CS323. See [Time logging](../time_logging.md) for details.
+- Please keep and submit a time log of time spent and major challenges you've encountered. This may be familiar to you if you've taken CS323. See [Time logging](#time-logging) for details.
 
 - Questions? post to Canvas or email the teaching staff at cs426ta@cs.yale.edu.
   - Richard Yang (yry@cs.yale.edu)
@@ -94,7 +94,7 @@ What are the advantages and disadvantages of each of these approaches? Can you t
 
 Include your thoughts (1~2 paragraphs) in a plain text file `discussions.txt` under a heading `B2`.
 
-**ExtraCredit1.** Suppose we start with a `StripedStringSet` with x unique strings. Goroutine/thread 0 issues a `Count()` call, while threads 1~N issues `Add()` calls with distinct strings. What values might the `Count()` in thread 0 return? Why? Does it matter which counting strategy (#1~3 above) we use? What about `LockedStringSet`? In light of this behavior, how might you define "correctness" for the method `Count()`? Include your thoughts in `discussions.txt` under a heading `ExtraCredit1`.
+**ExtraCredit1.** Suppose we start with a `StripedStringSet` with x unique strings. Goroutine/thread 0 issues a `Count()` call, while threads 1 through N issues `Add()` calls with distinct strings. What values might the `Count()` in thread 0 return? Why? Does it matter which counting strategy (#1 through 3 above) we use? What about `LockedStringSet`? In light of this behavior, how might you define "correctness" for the method `Count()`? Include your thoughts in `discussions.txt` under a heading `ExtraCredit1`.
 
 ## Part C. Channels, goroutines, and parallelization
 **C1.** Implement the API `PredRange(begin, end, pattern)` to return all strings matching a particular pattern within a range `[begin, end)` lexicographically.
@@ -121,3 +121,79 @@ You may use [`regexp.Match`](https://pkg.go.dev/regexp).
     - `go mod tidy` cleans up the module dependencies.
     - `go test -race ...` turns on the Go race detector.
     - `go vet` examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string. Vet uses heuristics that do not guarantee all reports are genuine problems, but it can find errors not caught by the compilers.
+
+# Time logging
+
+Source: from Prof. Stan Eisenstat's CS223/323 courses. Obtained via Prof. James Glenn [here](https://zoo.cs.yale.edu/classes/cs223/f2020/Projects/log.html).
+
+Each lab submission must contain a complete log `time.log`. Your log file should be a plain text file of the general form (that below is mostly fictitious):
+
+```
+ESTIMATE of time to complete assignment: 10 hours
+
+      Time     Time
+Date  Started  Spent Work completed
+----  -------  ----  --------------
+8/01  10:15pm  0:45  read assignment and played several games to help me
+                     understand the rules.
+8/02   9:00am  2:20  wrote functions for determining whether a roll is
+                     three of a kind, four of a kind, and all the other
+                     lower categories
+8/04   4:45pm  1:15  wrote code to create the graph for the components
+8/05   7:05pm  2:00  discovered and corrected two logical errors; code now
+                     passes all tests except where choice is Yahtzee
+8/07  11:00am  1:35  finished debugging; program passes all public tests
+               ----
+               7:55  TOTAL time spent
+
+I discussed my solution with: Petey Salovey, Biddy Martin, and Biff Linnane
+(and watched four episodes of Futurama).
+
+Debugging the graph construction was difficult because the size of the
+graph made it impossible to check by hand.  Using asserts helped
+tremendously, as did counting the incoming and outgoing edges for
+each vertex.  The other major problem was my use of two different variables
+in the same function called _score and score.  The last bug ended up being
+using one in place of the other; I now realize the danger of having two
+variables with names varying only in punctuation -- since they both sound
+the same when reading the code back in my head it was not obvious when
+I was using the wrong one.
+```
+
+Your log MUST contain:
+ - your estimate of the time required (made prior to writing any code),
+ - the total time you actually spent on the assignment,
+ - the names of all others (but not members of the teaching staff) with whom you discussed the assignment for more than 10 minutes, and
+ - a brief discussion (100 words MINIMUM) of the major conceptual and coding difficulties that you encountered in developing and debugging the program (and there will always be some).
+
+The estimated and total times should reflect time outside of class.  Submissions
+with missing or incomplete logs will be subject to a penalty of 5-10% of the
+total grade, and omitting the names of collaborators is a violation of the
+academic honesty policy.
+
+To facilitate analysis, the log file MUST the only file submitted whose name contains the string "log" and the estimate / total MUST be on the only line in that file that contains the string "ESTIMATE" / "TOTAL".
+
+# Collaboration policy
+
+## General Statement on Collaboration
+TL;DR: Same as [CS323](https://zoo.cs.yale.edu/classes/cs323/current/syllabus.html)for the individual labs (which Labs 0-4 are).
+
+Programming, like composition, is an individual creative process in which you must reach your own understanding of the problem and discover a path to its solution. During this time, discussions with others (including members of the teaching staff) are encouraged. But see the Gilligan's Island Rule below.
+
+However, when the time comes to design the program and write the code, such discussions are no longer appropriate---your solution must be your own personal inspiration (although you may ask members of the teaching staff for help in understanding, designing, writing, and debugging).
+
+Since code reuse is an important part of programming, you may study and/or incorporate published code (e.g., from text books or the Net) in your programs, provided that you give proper attribution in your source code and in your log file and that the bulk of the code submitted is your own. Note: Removing/rewriting comments, renaming functions/variables, or reformatting statements does not convey ownership.
+
+But when you incorporate more than 25 lines of code from a single source, this code (prefaced by a comment identifying the source) must be isolated in a separate file that the rest of your code #include-s or links with. The initial submission of this file should contain only the identifying comment and the original code; revisions may only change types or function/variable names, turn blocks of code into functions, or add comments.
+
+DO NOT UNDER ANY CIRCUMSTANCES COPY SOMEONE ELSE'S CODE OR GIVE A COPY OF YOUR CODE TO SOMEONE ELSE OR OTHERWISE MAKE IT PUBLICLY AVAILABLE---to do so is a clear violation of ethical/academic standards that, when discovered, will be referred to the Executive Committee of Yale College for disciplinary action. Modifying code to conceal copying only compounds the offense.
+
+## The Gilligan's Island Rule
+
+When discussing an assignment with anyone other than a member of the teaching staff, you may write on a board or a piece of paper, but you may not keep any written or electronic record of the discussion. Moreover, you must engage in some mind-numbing activity (e.g., watching an episode of Gilligan's Island) before you work on the assignment again. This will ensure that you can reconstruct what you learned, by yourself, using your own brain. The same rule applies to reading books or studying on-line sources.
+
+## Tips on asking good questions / help us help you
+- First, try to find the answer(s) by Googling. See above about rules re: code reuse and attribution.
+- For technical questions, prefer posting to Canvas such that your classmates may answer your question(s) and benefit from the answer(s).
+- Help your classmates by answering their questions! You are not in competition with one another, so help each other learn!
+- Identify the [**minimum reproducible example**](https://myweb.uiowa.edu/pbreheny/reproducible.html) of your problem. E.g., for Go language related questions, attempt to construct a small example on [Go playground](https://go.dev/play/) (which has sharing functionality).

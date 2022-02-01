@@ -1,11 +1,25 @@
 package string_set
 
 import (
+	"fmt"
 	"math/rand"
+	"reflect"
 	"runtime"
+	"sort"
 	"strconv"
 	"testing"
 )
+
+func randomString(length int) string {
+	chars := "abcdefghijklmnopqrstuv"
+
+	out := ""
+	for i := 0; i < length; i++ {
+		randomChar := chars[rand.Int()%len(chars)]
+		out = out + string(randomChar)
+	}
+	return out
+}
 
 func testSimpleAdds(t *testing.T, set StringSet) {
 	if set.Count() != 0 {
@@ -26,6 +40,29 @@ func testSimpleAdds(t *testing.T, set StringSet) {
 	}
 	if set.Count() != 2 {
 		t.Errorf("Expected count to update to 2")
+	}
+}
+
+func testSimpleScans(t *testing.T, set StringSet) {
+	set.Add("abc")
+	set.Add("bbc")
+	set.Add("def")
+	set.Add("dbf")
+	set.Add("123")
+	set.Add("123b")
+
+	result := set.PredRange("a", "c", ".*")
+	sort.Strings(result)
+	expectedResult := []string{"abc", "bbc"}
+	if !reflect.DeepEqual(result, expectedResult) {
+		t.Errorf("Expected abc and bbc to be between a and c")
+	}
+
+	result = set.PredRange("a", "z", "b")
+	sort.Strings(result)
+	expectedResult = []string{"abc", "bbc", "dbf"}
+	if !reflect.DeepEqual(result, expectedResult) {
+		t.Errorf("Expected scan to return strings with b")
 	}
 }
 
@@ -69,27 +106,35 @@ func testConcurrentAdds(t *testing.T, set StringSet) {
 	}
 }
 
-func TestLockedSimpleAdds(t *testing.T) {
-	set := MakeLockedStringSet()
-	testSimpleAdds(t, &set)
-}
-
-func TestLockedConcurrentAdds(t *testing.T) {
-	set := MakeLockedStringSet()
-	testConcurrentAdds(t, &set)
-}
-
-func TestStripedSimpleAdds(t *testing.T) {
-	for stripes := 1; stripes <= 20; stripes++ {
-		set := MakeStripedStringSet(stripes)
+func TestLocked(t *testing.T) {
+	t.Run("locked/simple", func(t *testing.T) {
+		set := MakeLockedStringSet()
 		testSimpleAdds(t, &set)
-	}
+	})
+	t.Run("locked/concurrent", func(t *testing.T) {
+		set := MakeLockedStringSet()
+		testConcurrentAdds(t, &set)
+	})
+	t.Run("locked/scans", func(t *testing.T) {
+		set := MakeLockedStringSet()
+		testSimpleScans(t, &set)
+	})
 }
 
-func TestStripedConcurrentAdds(t *testing.T) {
+func TestStriped(t *testing.T) {
 	for stripes := 1; stripes <= 20; stripes++ {
-		set := MakeStripedStringSet(stripes)
-		testConcurrentAdds(t, &set)
+		t.Run(fmt.Sprintf("striped/simple/stripes=%d", stripes), func(t *testing.T) {
+			set := MakeStripedStringSet(stripes)
+			testSimpleAdds(t, &set)
+		})
+		t.Run(fmt.Sprintf("striped/concurrent/stripes=%d", stripes), func(t *testing.T) {
+			set := MakeStripedStringSet(stripes)
+			testConcurrentAdds(t, &set)
+		})
+		t.Run(fmt.Sprintf("striped/scans/stripes=%d", stripes), func(t *testing.T) {
+			set := MakeStripedStringSet(stripes)
+			testSimpleScans(t, &set)
+		})
 	}
 }
 
@@ -102,32 +147,96 @@ func benchmarkAdds(b *testing.B, set StringSet) {
 	})
 }
 
+func benchmarkCounts(b *testing.B, set StringSet) {
+	for i := 0; i < 10000; i++ {
+		set.Add(randomString(10))
+	}
+	b.RunParallel(func(pb *testing.PB) {
+		for j := 0; pb.Next(); j++ {
+			if set.Count() == 0 {
+				b.Fail()
+			}
+		}
+	})
+}
+
+func benchmarkAddsAndCounts(b *testing.B, set StringSet) {
+	b.RunParallel(func(pb *testing.PB) {
+		i := rand.Intn(100)
+		for j := 0; pb.Next(); j++ {
+			set.Add(strconv.Itoa(i + j%1000))
+			if set.Count() == 0 {
+				b.Fail()
+			}
+		}
+	})
+}
+
+func benchmarkScanSerial(b *testing.B, set StringSet) {
+	for i := 0; i < 100000; i++ {
+		set.Add(randomString(10))
+	}
+	for i := 0; i < b.N; i++ {
+		set.PredRange("1", "8", "2.*4")
+	}
+}
+
+func benchmarkScanParallel(b *testing.B, set StringSet) {
+	for i := 0; i < 100000; i++ {
+		set.Add(randomString(10))
+	}
+	b.RunParallel(func(pb *testing.PB) {
+		for i := 0; pb.Next(); i++ {
+			set.PredRange("1", "8", "2.*4")
+		}
+	})
+}
+
 func BenchmarkLockedStringSet(b *testing.B) {
-	set := MakeLockedStringSet()
-	benchmarkAdds(b, &set)
+	b.Run("adds", func(b *testing.B) {
+		set := MakeLockedStringSet()
+		benchmarkAdds(b, &set)
+	})
+	b.Run("counts", func(b *testing.B) {
+		set := MakeLockedStringSet()
+		benchmarkCounts(b, &set)
+	})
+	b.Run("adds+counts", func(b *testing.B) {
+		set := MakeLockedStringSet()
+		benchmarkAddsAndCounts(b, &set)
+	})
+	b.Run("scans/serial", func(b *testing.B) {
+		set := MakeLockedStringSet()
+		benchmarkScanSerial(b, &set)
+	})
+	b.Run("scans/parallel", func(b *testing.B) {
+		set := MakeLockedStringSet()
+		benchmarkScanParallel(b, &set)
+	})
 }
 
-func BenchmarkStripedStringSet1(b *testing.B) {
-	set := MakeStripedStringSet(1)
-	benchmarkAdds(b, &set)
-}
-
-func BenchmarkStripedStringSet2(b *testing.B) {
-	set := MakeStripedStringSet(2)
-	benchmarkAdds(b, &set)
-}
-
-func BenchmarkStripedStringSetNumCores(b *testing.B) {
-	set := MakeStripedStringSet(runtime.NumCPU())
-	benchmarkAdds(b, &set)
-}
-
-func BenchmarkStripedStringSetNumCoresTimesTwo(b *testing.B) {
-	set := MakeStripedStringSet(runtime.NumCPU() * 2)
-	benchmarkAdds(b, &set)
-}
-
-func BenchmarkStripedStringSetNumCoresTimesEight(b *testing.B) {
-	set := MakeStripedStringSet(runtime.NumCPU() * 8)
-	benchmarkAdds(b, &set)
+func BenchmarkStripedStringSet(b *testing.B) {
+	stripeCounts := []int{1, 2, runtime.NumCPU(), runtime.NumCPU() * 2, runtime.NumCPU() * 8}
+	for _, count := range stripeCounts {
+		b.Run(fmt.Sprintf("adds/stripes=%d", count), func(b *testing.B) {
+			set := MakeStripedStringSet(count)
+			benchmarkAdds(b, &set)
+		})
+		b.Run(fmt.Sprintf("counts/stripes=%d", count), func(b *testing.B) {
+			set := MakeStripedStringSet(count)
+			benchmarkCounts(b, &set)
+		})
+		b.Run(fmt.Sprintf("adds+counts/stripes=%d", count), func(b *testing.B) {
+			set := MakeStripedStringSet(count)
+			benchmarkAddsAndCounts(b, &set)
+		})
+		b.Run(fmt.Sprintf("scans/serial/stripes=%d", count), func(b *testing.B) {
+			set := MakeStripedStringSet(count)
+			benchmarkScanSerial(b, &set)
+		})
+		b.Run(fmt.Sprintf("scans/parallel/stripes=%d", count), func(b *testing.B) {
+			set := MakeStripedStringSet(count)
+			benchmarkScanParallel(b, &set)
+		})
+	}
 }
