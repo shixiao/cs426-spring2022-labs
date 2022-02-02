@@ -37,8 +37,9 @@ Build a data structure `LockedStringSet` which implements the `StringSet` interf
 
 You can now run the provided simple unittest and possibly add your own. `-v` turns on the verbose flag which provides more information about the test run. `-race` turns on the [Go race detector](https://go.dev/doc/articles/race_detector), which is a tool that detects data races.
 ```
-go test -run Locked -race -v
+go test -run 'TestLocked/locked/(simple|concurrent)' -race -v
 ```
+(You can run the test for `PredRange` after you've completed it in Part C.)
 
 ## Part B. Lock striping
 
@@ -46,7 +47,7 @@ go test -run Locked -race -v
 
 The following command runs the benchmark with names matching `Locked` (`-bench=Locked`), prevents tests from running (`-run=^$`), collects the CPU profile, and outputs the result into `profile.out`.
 ```
-go test -v -bench=Locked -run=^$ -benchmem -cpuprofile profile.out
+go test -v -bench=LockedStringSet/adds -run=^$ -benchmem -cpuprofile profile.out
 ```
 To view the profile, run `go tool pprof profile.out`. type `top` to view the most time consuming functions, and `png` to generate a graph (you need to install [graphviz](https://graphviz.org/download/)). The lab0 repo includes one such example graph.
 ```
