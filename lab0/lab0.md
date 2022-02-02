@@ -106,7 +106,7 @@ You may use [`regexp.Match`](https://pkg.go.dev/regexp).
 
 **C2.** Parallelize your implementation of `PredRange` by spinning up a goroutine for each stripe and aggregate the results in the end.
 
-**C3.** Run the provided benchmark now and see the difference in performance between `LockedStringSet` and `StripedStringSet` with 2 stripes (`BenchmarkStripedStringSet2`). What do you observe? Include the results in `discussions.txt` under a heading `C3`.
+**C3.** Run the provided benchmark now and see the difference in performance between `LockedStringSet` and `StripedStringSet` with 2 stripes. E.g., to run only the adds benchmark for the 2-stripes cases, `go test -v -bench="StripedStringSet/adds$/stripes=2$" -run=^$`; but you should run more individual benchmarks to compare. What do you observe? Include the results in `discussions.txt` under a heading `C3`.
 
 **C4.** Generate a graph visualization of a profile for `StripedStringSet` with `stripeCount == NumCPU() * 2`. Name this `profile_striped_num_cpu_times_two.png`.
 
