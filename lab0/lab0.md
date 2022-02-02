@@ -37,7 +37,7 @@ Build a data structure `LockedStringSet` which implements the `StringSet` interf
 
 You can now run the provided simple unittest and possibly add your own. `-v` turns on the verbose flag which provides more information about the test run. `-race` turns on the [Go race detector](https://go.dev/doc/articles/race_detector), which is a tool that detects data races.
 ```
-go test string_set -race -v
+go test -run Locked -race -v
 ```
 
 ## Part B. Lock striping
