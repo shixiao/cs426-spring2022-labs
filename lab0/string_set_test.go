@@ -205,11 +205,11 @@ func BenchmarkLockedStringSet(b *testing.B) {
 		set := MakeLockedStringSet()
 		benchmarkAddsAndCounts(b, &set)
 	})
-	b.Run("scans/serial", func(b *testing.B) {
+	b.Run("scans:serial", func(b *testing.B) {
 		set := MakeLockedStringSet()
 		benchmarkScanSerial(b, &set)
 	})
-	b.Run("scans/parallel", func(b *testing.B) {
+	b.Run("scans:parallel", func(b *testing.B) {
 		set := MakeLockedStringSet()
 		benchmarkScanParallel(b, &set)
 	})
@@ -230,11 +230,11 @@ func BenchmarkStripedStringSet(b *testing.B) {
 			set := MakeStripedStringSet(count)
 			benchmarkAddsAndCounts(b, &set)
 		})
-		b.Run(fmt.Sprintf("scans/serial/stripes=%d", count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("scans:serial/stripes=%d", count), func(b *testing.B) {
 			set := MakeStripedStringSet(count)
 			benchmarkScanSerial(b, &set)
 		})
-		b.Run(fmt.Sprintf("scans/parallel/stripes=%d", count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("scans:parallel/stripes=%d", count), func(b *testing.B) {
 			set := MakeStripedStringSet(count)
 			benchmarkScanParallel(b, &set)
 		})

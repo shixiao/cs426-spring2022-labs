@@ -45,11 +45,31 @@ go test -run 'TestLocked/locked/(simple|concurrent)' -race -v
 
 **Benchmarks** and **Profilers** are important tools to evaluate performance of one's code, protocol, or systems. Single-machine, small-scale benchmarks are often called _micro-benchmarks_. Profilers collect the runtime metrics of a program (often a benchmark) to guide performance optimizations. The most common profiles include CPU profiles and memory profiles. Benchmarking and profiling can be somewhat of a minefield since it's easy to be measuring the wrong thing or drawing incorrect conclusions, e.g., sometimes one's benchmark setup take more CPU cycles to run than the core logic of interest. We will only get a taste of it in this lab.
 
-The following command runs the benchmark with names matching `Locked` (`-bench=Locked`), prevents tests from running (`-run=^$`), collects the CPU profile, and outputs the result into `profile.out`.
+The following command runs a selected set of benchmarks. Specifically, `-bench=LockedStringSet/adds$` selects benchmarks whose names match `LockedStringSet` (can also be a regex) and whose sub-benchmark names match `adds$`. `-run=^$` prevents tests in the same file from running such that the profiling results only contains traces while the benchmark(s) are running and not the tests.
 ```
-go test -v -bench=LockedStringSet/adds -run=^$ -benchmem -cpuprofile profile.out
+go test -v -bench=LockedStringSet/adds$ -run=^$
+
+goos: darwin
+goarch: amd64
+pkg: cs426.yale.edu/lab0
+cpu: VirtualApple @ 2.50GHz
+BenchmarkLockedStringSet
+BenchmarkLockedStringSet/adds
+BenchmarkLockedStringSet/adds-10                 8497728               136.6 ns/op
+PASS
+ok      cs426.yale.edu/lab0     1.534s
 ```
-To view the profile, run `go tool pprof profile.out`. type `top` to view the most time consuming functions, and `png` to generate a graph (you need to install [graphviz](https://graphviz.org/download/)). The lab0 repo includes one such example graph.
+
+This command outputs the latency for the operation (`136.6 ns/op`) as well as the number of iterations run (`8497728`) to obtain this stat. The `-10` at the end of the benchmark name is the number of cores used for this benchmark--this output was generated on a 10-core M1. depending on the machine, this will differ.
+
+When you are benchmarking, it's convenient to run multiple benchmarks in a single run. `go test` treats `/` in `-bench` or `-run` as delimiter of test/benchmark names and sub-test/sub-benchmark names, but treat the `/` delimited compoenents as regexes. You can read more on sub-tests and sub-benchmarks [here](https://pkg.go.dev/testing#hdr-Subtests_and_Sub_benchmarks).
+
+In contrast, when you are profiling, limit to running a single benchmark, otherwise your profiling result will show traces for all benchmarks that are run during the `go test` invocation. The following command collects the CPU profile, and outputs the result into `profile.out`.
+```
+go test -v -bench=LockedStringSet/adds$ -run=^$ -cpuprofile profile.out
+```
+
+To visualize the profile, run `go tool pprof profile.out`. type `top` to view the most time consuming functions, and `png` to generate a graph (you need to install [graphviz](https://graphviz.org/download/)). The lab0 repo includes one such example graph.
 ```
 $  go tool pprof profile.out
 
@@ -98,17 +118,17 @@ Include your thoughts (1~2 paragraphs) in a plain text file `discussions.txt` un
 **ExtraCredit1.** Suppose we start with a `StripedStringSet` with x unique strings. Goroutine/thread 0 issues a `Count()` call, while threads 1 through N issues `Add()` calls with distinct strings. What values might the `Count()` in thread 0 return? Why? Does it matter which counting strategy (#1 through 3 above) we use? What about `LockedStringSet`? In light of this behavior, how might you define "correctness" for the method `Count()`? Include your thoughts in `discussions.txt` under a heading `ExtraCredit1`.
 
 ## Part C. Channels, goroutines, and parallelization
-**C1.** Implement the API `PredRange(begin, end, pattern)` to return all strings matching a particular pattern within a range `[begin, end)` lexicographically.
+**C1.** Implement the API `PredRange(begin, end, pattern)` to return all strings matching a particular pattern within a range `[begin, end)` lexicographically. Please implement this function for both `LockedStringSet` and `StripedStringSet`.
 
 For example, if the string set `s` contains `{"barabc", "bazdef", "fooabc", "tusabc", "zyxabc"}`, calling `s.PredRange("barabc", "zyxabc", "abc")` should return `["barabc", "fooabc", "tusabc"]`.
 
 You may use [`regexp.Match`](https://pkg.go.dev/regexp).
 
-**C2.** Parallelize your implementation of `PredRange` by spinning up a goroutine for each stripe and aggregate the results in the end.
+**C2.** Parallelize your implementation of `PredRange` for `StripedStringSet` by spinning up a goroutine for each stripe and aggregate the results in the end.
 
-**C3.** Run the provided benchmark now and see the difference in performance between `LockedStringSet` and `StripedStringSet` with 2 stripes. E.g., to run only the adds benchmark for the 2-stripes cases, `go test -v -bench="StripedStringSet/adds$/stripes=2$" -run=^$`; but you should run more individual benchmarks to compare. What do you observe? Include the results in `discussions.txt` under a heading `C3`.
+**C3.** Pick _one_ of the `adds+counts` or `scans:parallel` sub-benchmarks. Run the provided subbenchmark and see the difference in performance between `LockedStringSet` and `StripedStringSet` with 2 stripes. What do you observe? Include the results in `discussions.txt` under a heading `C3`.
 
-**C4.** Generate a graph visualization of a profile for `StripedStringSet` with `stripeCount == NumCPU() * 2`. Name this `profile_striped_num_cpu_times_two.png`.
+**C4.** Use the same subbenchmark as C3. Generate a graph visualization of a profile for `StripedStringSet` with `stripeCount == NumCPU() * 2`. Name this `profile_striped_num_cpu_times_two.png`.
 
 **ExtraCredit2.** Discuss the effect of the parameter stripeCount on the performance (compared to `LockedStringSet`). What do you notice? Why? What's the optimal stripeCount (feel free to try other numbers and include the result in the discussion)? Include your thoughts in `discussions.txt` under a heading `ExtraCredit2`.
 
