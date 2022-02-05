@@ -120,7 +120,7 @@ Include your thoughts (1~2 paragraphs) in a plain text file `discussions.txt` un
 ## Part C. Channels, goroutines, and parallelization
 **C1.** Implement the API `PredRange(begin, end, pattern)` to return all strings matching a particular pattern within a range `[begin, end)` lexicographically. Please implement this function for both `LockedStringSet` and `StripedStringSet`.
 
-For example, if the string set `s` contains `{"barabc", "bazdef", "fooabc", "tusabc", "zyxabc"}`, calling `s.PredRange("barabc", "zyxabc", "abc")` should return `["barabc", "fooabc", "tusabc"]`.
+For example, if the string set `s` contains `{"barabc", "bazdef", "fooabc", "tusabc", "zyxabc"}`, calling `s.PredRange("barabc", "zyxabc", "abc")` should return `["barabc", "tusabc", "fooabc"]`. Note that the return does not have to be in lexicographic order.
 
 You may use [`regexp.Match`](https://pkg.go.dev/regexp).
 
