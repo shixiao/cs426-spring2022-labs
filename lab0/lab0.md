@@ -28,7 +28,7 @@ time.log
 ```
 
 ## Preparation
-1. Install Go (or run Go on a Zoo machine) following [this guide]().
+1. Install Go (or run Go on a Zoo machine) following [this guide](https://go.dev/doc/install). We also recommend that you install Go extensions to whichever editor you are using, e.g., [for VSCode](https://code.visualstudio.com/docs/languages/go), [for Atom](https://atom.io/packages/go-plus).
 2. Complete the [Tour of Go](https://go.dev/tour/list). Pay special attention to the concurrency module. Use the exercises in the tutorial as checkpoints of your Go familiarity, but we won't as you to submit your solutions or grade them. That said, skip them at your own peril as all of the labs this semster will be in Go.
 3. Check out the list of [Go tips and FAQs](#go-tips-and-faqs) as you set up your development workflow.
 
