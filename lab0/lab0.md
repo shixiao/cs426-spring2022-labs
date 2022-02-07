@@ -113,9 +113,9 @@ You may find it helpful to review the following references to understand the tec
 
 What are the advantages and disadvantages of each of these approaches? Can you think of query patterns where one works better than another?
 
-Include your thoughts (1~2 paragraphs) in a plain text file `discussions.txt` under a heading `B2`.
+Include your thoughts (1~2 paragraphs) in a plain text file `discussions.txt` under a heading **B2**.
 
-**ExtraCredit1.** Suppose we start with a `StripedStringSet` with x unique strings. Goroutine/thread 0 issues a `Count()` call, while threads 1 through N issues `Add()` calls with distinct strings. What values might the `Count()` in thread 0 return? Why? Does it matter which counting strategy (#1 through 3 above) we use? What about `LockedStringSet`? In light of this behavior, how might you define "correctness" for the method `Count()`? Include your thoughts in `discussions.txt` under a heading `ExtraCredit1`.
+**ExtraCredit1.** Suppose we start with a `StripedStringSet` with x unique strings. Goroutine/thread 0 issues a `Count()` call, while threads 1 through N issues `Add()` calls with distinct strings. What values might the `Count()` in thread 0 return? Why? Does it matter which counting strategy (#1 through 3 above) we use? What about `LockedStringSet`? In light of this behavior, how might you define "correctness" for the method `Count()`? Include your thoughts in `discussions.txt` under a heading **ExtraCredit1**.
 
 ## Part C. Channels, goroutines, and parallelization
 **C1.** Implement the API `PredRange(begin, end, pattern)` to return all strings matching a particular pattern within a range `[begin, end)` lexicographically. Please implement this function for both `LockedStringSet` and `StripedStringSet`.
@@ -126,11 +126,12 @@ You may use [`regexp.Match`](https://pkg.go.dev/regexp).
 
 **C2.** Parallelize your implementation of `PredRange` for `StripedStringSet` by spinning up a goroutine for each stripe and aggregate the results in the end.
 
-**C3.** Pick _one_ of the `adds+counts` or `scans:parallel` sub-benchmarks. Run the provided subbenchmark and see the difference in performance between `LockedStringSet` and `StripedStringSet` with 2 stripes. What do you observe? Include the results in `discussions.txt` under a heading `C3`.
+**C3.** Pick _one_ of the `adds+counts` or `scans:parallel` sub-benchmarks. Run the provided subbenchmark and see the difference in performance between `LockedStringSet` and `StripedStringSet` with 2 stripes. What do you observe? Is that expected? Why? Include your response in `discussions.txt` under a heading **C3**.
+(For a hint, see **ExtraCredit2**.)
 
 **C4.** Use the same subbenchmark as C3. Generate a graph visualization of a profile for `StripedStringSet` with `stripeCount == NumCPU() * 2`. Name this `profile_striped_num_cpu_times_two.png`.
 
-**ExtraCredit2.** Discuss the effect of the parameter stripeCount on the performance (compared to `LockedStringSet`). What do you notice? Why? What's the optimal stripeCount (feel free to try other numbers and include the result in the discussion)? Include your thoughts in `discussions.txt` under a heading `ExtraCredit2`.
+**ExtraCredit2.** Discuss the effect of the parameter stripeCount on the performance (compared to `LockedStringSet`). What do you notice? Why? What's the optimal stripeCount (feel free to try other numbers and include the result in the discussion)? Include your thoughts in `discussions.txt` under a heading **ExtraCredit2**.
 
 # End of Lab 0
 ---
@@ -197,7 +198,7 @@ To facilitate analysis, the log file MUST the only file submitted whose name con
 # Collaboration policy
 
 ## General Statement on Collaboration
-TL;DR: Same as [CS323](https://zoo.cs.yale.edu/classes/cs323/current/syllabus.html)for the individual labs (which Labs 0-4 are).
+TL;DR: Same as [CS323](https://zoo.cs.yale.edu/classes/cs323/current/syllabus.html) for the individual labs (which Labs 0-4 are).
 
 Programming, like composition, is an individual creative process in which you must reach your own understanding of the problem and discover a path to its solution. During this time, discussions with others (including members of the teaching staff) are encouraged. But see the Gilligan's Island Rule below.
 
