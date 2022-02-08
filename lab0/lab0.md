@@ -16,7 +16,8 @@ The goal of this lab is to familiarize you with the Go programming language, mul
 
 **Submission deadline: 23:59 ET Wednesday Feb 9, 2022**
 
-**Submission logistics** TBA.
+**Submission logistics** Submit as a `.tar.gz` archive named after your NetID.
+E.g., `xs66.tar.gz`
 
 Your submission for this lab should include the following files:
 ```
@@ -96,9 +97,9 @@ Showing top 10 nodes out of 58
 Generating report in profile001.png
 ```
 
-As you can see in the sample output (`profile001.png`), the single RWMutex has become the bottleneck on the data structure (`runtime.usleep` is part of the RWMutex locking and waiting strategy to aoid thrashing or busy wait). "Lock striping" is a common technique to get around lock contention of a coarse-grained lock.
+As you can see in the sample output (`profile001.png`), the single RWMutex has become the bottleneck on the data structure (`runtime.usleep` is part of the RWMutex locking and waiting strategy to avoid thrashing or busy wait). Depending on your `LockedStringSet` implementation and the hardware (e.g., CPU architecture etc.), your profile might look very different from the example. The main point here is that you see lock contention in the single RWMutex.
 
-The idea is to split the data structure into "stripes" (or "buckets", or "shards"), each protected by its own finer-grained lock. Many queries can then be either parallelized or served from a single stripe. Typically, stripes are divided based on a good hash of the key or id (in our case, the string).
+"Lock striping" is a common technique to get around lock contention of a coarse-grained lock. The idea is to split the data structure into "stripes" (or "buckets", or "shards"), each protected by its own finer-grained lock. Many queries can then be either parallelized or served from a single stripe. Typically, stripes are divided based on a good hash of the key or id (in our case, the string).
 
 **B1.** Implement `StripedStringSet` which offers the same API as `StringSet` but uses lock striping. Add a factory function that constructs a `StripedStringSet` with a given stripe count. (Starter code in `striped_string_set.go`.)
 
@@ -126,7 +127,7 @@ You may use [`regexp.Match`](https://pkg.go.dev/regexp).
 
 **C2.** Parallelize your implementation of `PredRange` for `StripedStringSet` by spinning up a goroutine for each stripe and aggregate the results in the end.
 
-**C3.** Pick _one_ of the `adds+counts` or `scans:parallel` sub-benchmarks. Run the provided subbenchmark and see the difference in performance between `LockedStringSet` and `StripedStringSet` with 2 stripes. What do you observe? Is that expected? Why? Include your response in `discussions.txt` under a heading **C3**.
+**C3.** Pick _one_ of the `adds+counts`, `scans:serial`, or `scans:parallel` sub-benchmarks. Run the provided subbenchmark and see the difference in performance between `LockedStringSet` and `StripedStringSet` with 2 stripes. What do you observe? Is that expected? Why? Include your response in `discussions.txt` under a heading **C3**.
 (For a hint, see **ExtraCredit2**.)
 
 **C4.** Use the same subbenchmark as C3. Generate a graph visualization of a profile for `StripedStringSet` with `stripeCount == NumCPU() * 2`. Name this `profile_striped_num_cpu_times_two.png`.
