@@ -5,7 +5,7 @@ Please make sure you read and understood the [Collaboration Policy](collaboratio
 Questions? post to Canvas or email the teaching staff at cs426ta@cs.yale.edu.
   - Richard Yang (yry@cs.yale.edu)
   - Xiao Shi (xiao.shi@aya.yale.edu)
-  - Scott Pruett (spruett345@gmail.com) (unavailable until Jan 30th)
+  - Scott Pruett (spruett345@gmail.com)
 
 ## Labs
  - Lab 0
