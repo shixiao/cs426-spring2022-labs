@@ -10,5 +10,5 @@ Questions? post to Canvas or email the teaching staff at cs426ta@cs.yale.edu.
 ## Labs
  - Lab 0
    - [Initial version](lab0/lab0.md)
- - Lab 0
+ - Lab 1
    - [Initial version](lab1/lab1.md)
