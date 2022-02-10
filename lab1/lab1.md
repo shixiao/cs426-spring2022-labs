@@ -25,7 +25,8 @@ Canvas. The Canvas assignment will be up a day or two before the deadline.
 
 Your submission for this lab should include the following files:
 ```
-video_rec_service/server/server.go
+video_rec_service/server_lib/server_lib.go
+video_rec_service/server/server.go // though you may not need to modify this file
 video_rec_service/server/server_test.go // create this file and add your own unittests
 discussions.txt
 time.log
@@ -53,7 +54,7 @@ Your first job will be to implement a single RPC method for VideoRecService: `Ge
 
 The overall strategy for the video recommending service will be to look at videos all the videos their subscribed-to-users have liked and rank them according to some properties (these will be wrapped as opaque coefficients, and the "ranking" algorithm is provided in the `ranker` library). To do this, the video recommending service will need to combine results from two different backends: the UserService (for fetching subscriptions and liked videos) and VideoService (for fetching video data). Both UserService and VideoService are also gRPC microservices, so VideoRecService will be using gRPC clients to communicate.
 
-We've provided you with skeleton code in `video_rec_service/server/server.go`. To try it out, `go run video_rec_service/server/server.go`. This code will start up and run the gRPC server on a given port (default `8080`) for you.
+We've provided you with skeleton code in `video_rec_service/server/server.go` and the accompanying server library `video_rec_service/server_lib/server_lib.go`. To try it out, `go run video_rec_service/server/server.go`. This code will start up and run the gRPC server on a given port (default `8080`) for you.
 
 
 ### Part A. Implementing GetTopVideos
@@ -158,9 +159,26 @@ go run cmd/frontend/frontend.go --net-id=xs66
 You should see some fake user info and recommended movies printed out. Include the name of the
 user picked for you as well as the top recommended video in your `discussions.txt` under heading **A6**.
 
-`frontend.go` also includes tests for two hardcoded UserIds and results, which you can use to verify your implementation. You should add your own unit tests in a separate `video_rec_service/server/server_test.go` file to test the functionality you built as you go.
+`frontend.go` also includes tests for two hardcoded UserIds and results, which you can use to verify your implementation.
 
-#### A7. Batching
+#### A7. Unittesting with mocks
+Unit testing is a good way to catch server logic bugs in short and contained
+test runs. You should add your own unit tests in a separate
+`video_rec_service/server/server_test.go` file to test the functionality you
+built as you go (for functionality up till now as well as the rest of the lab).
+
+Since the bulk of the application logic goes into the server_lib of VideoRecServiceServer, here's how you can implement the unit tests:
+ - Complete the function `MakeVideoRecServiceServerWithMocks`, which takes in options as well as the provided mock clients for the User and Video services. You can read the code for the mock clients in `user|video_service/mock_client/mock_client.go`, which are quite straight forward;
+ - In `server_test.go`, add unittest skeleton code following the Golang testing tutorials such as [this](https://go.dev/doc/tutorial/add-a-test) and [this](https://pkg.go.dev/testing);
+ - In each unittest, spin up a `VideoRecServiceServer` by calling `MakeVideoRecServiceServerWithMocks` with the desired options.
+
+By the end of this lab, you should add at least 5 unit tests. Your tests should have coverage (i.e., at least part of one unit test) on the basic functionality, batching, stats, error handing, retrying, fallback to trending videos. You of course are welcome to add more tests than just 5.
+
+`go test -run='.*' -v` should pass on your implementation as well as our private reference impl. (**Extra credit** will be given to tests that caught bugs in our reference impl :p )
+
+Note: your actual server **must** be able to communicate with the user|video services via grpc and not solely rely on the mock clients. When we grade the server binary, we will use different undisclosed random seeds for user|video services that your video recommendation server is unaware of; an attempt to use the mock clients to avoid implementing more complex logic such as error handling will be considered cheating.
+
+#### A8. Batching
 
 Both `VideoService` and `UserService` support a batch API---you can send multiple user IDs or video IDs and get back a batched response for all the requested IDs. In practice, many services have an upper bound on how many sub-requests they will handle at once, to prevent large requests from occupying too many resources (the smaller batches may also be easier to spread among backend machines in a distributed environment).
 
@@ -170,7 +188,7 @@ the set of IDs among them.
 You can test that your functionality works by starting `UserService` and `VideoService` locally (like before) and setting `--batch-size=5` on all three services, then running the steps from **A6** again to see that it does not error.
 
 
-**Discussion**: Should you send the batched requests concurrently? Why or why not? What are the advantages or disadvantages? Include your responses under a heading `A7` in `discussions.txt`.
+**Discussion**: Should you send the batched requests concurrently? Why or why not? What are the advantages or disadvantages? Include your responses under a heading `A8` in `discussions.txt`.
 
 **ExtraCredit2**: Assume that handling one batch request is cheap up to the batch size limit. How could you reduce the total number of requests to `UserService` and `VideoService` using batching, assuming you have many incoming requests to `VideoRecService`? Describe how you would implement this at a high-level (bullet points and pseudocode are fine) but you do not need to implement it in your service.
 Include your responses under a heading `ExtraCredit2` in `discussions.txt`.
@@ -191,10 +209,10 @@ To implement the `GetStats` method, you'll need to keep track of calls to your `
 
 These stats can be tracked as state in your`VideoRecServiceServer` type or elsewhere, but they need to be thread-safe. You'll need to update them as calls to `GetTopVideos` progress as part of your request handling logic. Using the [`defer` statement](https://go.dev/tour/flowcontrol/12) may be helpful for some of these cases.
 
-Add a skeleton for the `GetStats` method to your `server.go`
+Add a skeleton for the `GetStats` method to your `server_lib.go`
 
 ```
-func (server *videoRecServiceServer) GetStats(
+func (server *VideoRecServiceServer) GetStats(
 	ctx context.Context,
 	req *pb.GetStatsRequest,
 ) (*pb.GetStatsResponse, error) {

@@ -1,16 +1,14 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 
 	pb "cs426.yale.edu/lab1/video_rec_service/proto"
+	sl "cs426.yale.edu/lab1/video_rec_service/server_lib"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -32,25 +30,6 @@ var (
 	)
 )
 
-type videoRecServiceServer struct {
-	pb.UnimplementedVideoRecServiceServer
-	// Add any data you want here
-}
-
-func makeVideoRecServiceServer() *videoRecServiceServer {
-	return &videoRecServiceServer{}
-}
-
-func (server *videoRecServiceServer) GetTopVideos(
-	ctx context.Context,
-	req *pb.GetTopVideosRequest,
-) (*pb.GetTopVideosResponse, error) {
-	return nil, status.Error(
-		codes.Unimplemented,
-		"VideoRecService: unimplemented!",
-	)
-}
-
 func main() {
 	flag.Parse()
 	log.Printf(
@@ -65,7 +44,11 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	server := makeVideoRecServiceServer()
+	server := sl.MakeVideoRecServiceServer(sl.VideoRecServiceOptions{
+		UserServiceAddr:  *userServiceAddr,
+		VideoServiceAddr: *videoServiceAddr,
+		MaxBatchSize:     *maxBatchSize,
+	})
 	pb.RegisterVideoRecServiceServer(s, server)
 	log.Printf("server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
