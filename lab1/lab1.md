@@ -26,6 +26,7 @@ Canvas. The Canvas assignment will be up a day or two before the deadline.
 Your submission for this lab should include the following files:
 ```
 video_rec_service/server/server.go
+video_rec_service/server/server_test.go // create this file and add your own unittests
 discussions.txt
 time.log
 ```
@@ -157,7 +158,7 @@ go run cmd/frontend/frontend.go --net-id=xs66
 You should see some fake user info and recommended movies printed out. Include the name of the
 user picked for you as well as the top recommended video in your `discussions.txt` under heading **A6**.
 
-Consider adding your own unit tests in a separate `..._test.go` file to test the functionality you built as you go.
+`frontend.go` also includes tests for two hardcoded UserIds and results, which you can use to verify your implementation. You should add your own unit tests in a separate `video_rec_service/server/server_test.go` file to test the functionality you built as you go.
 
 #### A7. Batching
 
