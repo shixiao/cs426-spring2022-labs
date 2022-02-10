@@ -20,8 +20,8 @@ As in production services, the provided backend services (as well as the network
 
 **Submission deadline: 23:59 ET Wednesday Feb 23, 2022**
 
-**Submission logistics** Submit as a `.tar.gz` archive named after your NetID,
-e.g., `xs66.tar.gz`.
+**Submission logistics** Submit a `.tar.gz` archive named after your NetID via
+Canvas. The Canvas assignment will be up a day or two before the deadline.
 
 Your submission for this lab should include the following files:
 ```
@@ -269,12 +269,20 @@ successful set of trending videos. Note down the tradeoffs of the strategies und
 in `discussions.txt`.
 
 You can verify your fallback strategy works by running the test from above and stopping user service entirely mid-run.
+You should see `stale_responses` increase in the loadgen output.
 
 #### C3. Other reliability strategies
 
 Name at least one additional strategy you could use to improve the reliability
 of `VideoRecService` (successful, and useful responses) in the event of failures of `UserService`
 or `VideoService`. What tradeoffs would you make and why? Add your response under heading **C3** in `discussions.txt`.
+
+#### C4. Connection management
+In part **A** you likely created new connections via `grpc.Dial()` to `UserService` and `VideoService` on every
+request when you needed to use them. What might be costly about connection establishment? (hint: for a high-throughput service you would want to avoid repeated connection
+establishment.) How could you change your implementation to avoid per-request connection establishment? Does it have any tradeoffs (consider
+topics such as load balancing from the course lectures)? Note your discussion under **C4** in `discussions.txt`, but
+you do not have to change your implementation.
 
 
 # End of Lab 1
