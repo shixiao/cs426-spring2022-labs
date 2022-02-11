@@ -2,7 +2,7 @@
 "Writing is thinking. To write well is to think clearly." Writing responses is an opportunity to clarify and consolidate your thinking on the assigned reading.
 
 ## Logistics
-* Materials (mostly papers) we'd like you to write reading responses for will be marked as "**PREREAD** for next class" in the schedule.
+* Materials (mostly papers) we'd like you to write reading responses for will be marked as "**PREREAD** for next class" in the [schedule](http://cs426.cloud/schedule.shtml) page.
 * Write your reading responses in the google doc shared with you ("<NetID> CS426 Reading Responses"; check "Shared with me" on your google drive).
 * Responses are due before class time for which the reading is assigned.
 
