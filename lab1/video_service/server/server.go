@@ -28,7 +28,7 @@ var (
 	)
 	maxBatchSize = flag.Int(
 		"batch-size",
-		250,
+		2000,
 		"Maximum size of batches accepted",
 	)
 )
