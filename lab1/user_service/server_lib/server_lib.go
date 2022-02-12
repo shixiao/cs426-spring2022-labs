@@ -31,7 +31,7 @@ func DefaultUserServiceOptions() *UserServiceOptions {
 		SleepNs:              0,
 		FailureRate:          0,
 		ResponseOmissionRate: 0,
-		MaxBatchSize:         50,
+		MaxBatchSize:         250,
 	}
 }
 

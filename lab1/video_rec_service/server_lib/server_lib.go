@@ -27,7 +27,7 @@ func DefaultVideoRecServiceOptions() VideoRecServiceOptions {
 	return VideoRecServiceOptions{
 		UserServiceAddr:  "[::1]:8081",
 		VideoServiceAddr: "[::1]:8082",
-		MaxBatchSize:     50,
+		MaxBatchSize:     250,
 	}
 }
 

@@ -25,7 +25,7 @@ var (
 	)
 	maxBatchSize = flag.Int(
 		"batch-size",
-		50,
+		250,
 		"Maximum size of batches sent to UserService and VideoService",
 	)
 )
