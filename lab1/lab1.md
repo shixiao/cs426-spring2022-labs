@@ -149,7 +149,7 @@ working implementation of `VideoRecService`. To test all of this out locally you
 run an instance all 3 microservices together. In 3 separate shells (or using background jobs in one shell), run:
  1. `go run user_service/server/server.go`
  2. `go run video_service/server/server.go`
- 3. `go run video_rec_service/server/sever.go`
+ 3. `go run video_rec_service/server/server.go`
 
 Once all of those start successfully, run our provided test client with **your own NetId**! For example, Xiao's NetId is `xs66`, therefore, the command to run is the following:
 ```
