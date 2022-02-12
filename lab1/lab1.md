@@ -84,6 +84,16 @@ To communicate with the `UserService` you'll need to create a gRPC client. We'll
 
 `grpc.Dial()` creates a "channel" (in this case, a network stream channel, not a Go built-in `chan`) which allows us to communicate with a server. Use this to create a channel to `UserService`, which you will use in **A3**. For the server address, use the global `userServiceAddr` which can be set from a configurable flag to your service.
 
+Note: for this lab, we are not using TLS, but `grpc.Dial()` does expect transport credentials:
+```
+import "google.golang.org/grpc/credentials/insecure"
+...
+var opts []grpc.DialOption
+opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+conn, err := grpc.Dial(address, opts...)
+```
+(This is what `cmd/frontend/frontend.go` does, for reference.)
+
 **Discussion**: What networking/socket API(s) do you think `Dial` corresponds to or is similar to? (For reference, you can find example socket APIs [here](https://en.wikipedia.org/wiki/Berkeley_sockets#Socket_API_functions) or in the slides for Lecture 3.) Include your responses under a heading **A1** in `discussions.txt`.
 
 #### A2. Handling errors
