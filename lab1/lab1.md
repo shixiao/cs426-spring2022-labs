@@ -58,6 +58,8 @@ The overall architecture diagram is the following:
 ![architecture diagram](./architecture_diagram.png)
 (N.B. you will be implementing the VideoRecService __server__ logic by creating and __using__ the UserService and VideoService __clients__.)
 
+[This diagram](./interactions.png) shows the overall flow and logic of the VideoRecService you'll be implementing. Note that you might need to send multiple requests for each arrow in the diagram.
+
 We've provided you with skeleton code in `video_rec_service/server/server.go` and the accompanying server library `video_rec_service/server_lib/server_lib.go`. To try it out, `go run video_rec_service/server/server.go`. This code will start up and run the gRPC server on a given port (default `8080`) for you.
 
 
