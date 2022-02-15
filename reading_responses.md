@@ -17,5 +17,25 @@
   * What worked well about the system? What would be the disadvantages?
   * Do you buy the authors' arguments? Why or why not?
   * Compare with one other system: consider systems that precede or come after the paper, what's similar? what's different? Why did the systems make different choices? To find related systems, it's often useful to look at the Related Work section of a paper or find on [Google Scholar](https://scholar.google.com/) later papers that cite the one at hand.
-  * Some reading response assignments have paper-specific prompts or questions that might also guide your reading.
+  * Some reading response assignments have paper-specific prompts or questions below that might also guide your reading.
 * **Grading:** the goal of this assignment is to ensure you have done your reading and get a chance for independent thinking and writing. This will be closer to participation grade unless you submit something entirely incoherent or made-up.
+
+## Specific prompts
+These prompts are also questions for you to think about and not necessarily a checklist you must complete.
+
+### Chubby
+* What are the tradeoffs Chubby made in offering a coarse-grained locking API?
+* Contrast DNS and Chubby's unexpected usage as a name server (Section 4.3).
+* Which lessons and discussions surprised you? Why?
+
+### Raft
+
+### Paxos
+
+### Delos
+* What are some of the ubiquitous examples of virtualization in other areas of computer science or related fields?
+* What's the point of Delos if it still requires a MetaStore using Paxos or Raft? Why not directly use the Paxos- or Raft-based store?
+
+### CopySet
+
+### TAO
