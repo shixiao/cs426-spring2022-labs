@@ -88,7 +88,7 @@ The request starts for a given user based on `user_id`. You will use the `UserSe
 
 To communicate with the `UserService` you'll need to create a gRPC client. We'll start with the basics, following the Go gRPC guide: https://grpc.io/docs/languages/go/basics/#client
 
-`grpc.Dial()` creates a "channel" (in this case, a network stream channel, not a Go built-in `chan`) which allows us to communicate with a server. Use this to create a channel to `UserService`, which you will use in **A3**. For the server address, use the `server.options.UserServiceAddr` which can be set from options passed to your service.
+`grpc.Dial()` creates a "channel" (in this case, a network stream channel, not a Go built-in `chan`) which allows us to communicate with a server. Use this to create a channel to `UserService`, which you will use in **A3**. For the server address, use the `server.options.UserServiceAddr` which can be set from options passed to your service "constructor" (i.e., `MakeVideoRecServiceServer(options)`). (Note the `DefaultVideoRecServiceOptions()` is only there for convenience in tests; your server should use the values in its member variable, i.e., `server.options`.)
 
 Note: for this lab, we are not using TLS, but `grpc.Dial()` does expect transport credentials:
 ```
