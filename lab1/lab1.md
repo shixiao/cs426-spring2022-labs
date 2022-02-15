@@ -54,6 +54,8 @@ Your first job will be to implement a single RPC method for VideoRecService: `Ge
 
 The overall strategy for the video recommending service will be to look at videos all the videos their subscribed-to-users have liked and rank them according to some properties (these will be wrapped as opaque coefficients, and the "ranking" algorithm is provided in the `ranker` library). To do this, the video recommending service will need to combine results from two different backends: the UserService (for fetching subscriptions and liked videos) and VideoService (for fetching video data). Both UserService and VideoService are also gRPC microservices, so VideoRecService will be using gRPC clients to communicate.
 
+As shown in this [architecture diagram](./architecture_diagram.png). (N.B. you will be implementing the VideoRecService __server__ logic by creating and __using__ the UserService and VideoService __clients__.)
+
 We've provided you with skeleton code in `video_rec_service/server/server.go` and the accompanying server library `video_rec_service/server_lib/server_lib.go`. To try it out, `go run video_rec_service/server/server.go`. This code will start up and run the gRPC server on a given port (default `8080`) for you.
 
 
@@ -82,7 +84,7 @@ The request starts for a given user based on `user_id`. You will use the `UserSe
 
 To communicate with the `UserService` you'll need to create a gRPC client. We'll start with the basics, following the Go gRPC guide: https://grpc.io/docs/languages/go/basics/#client
 
-`grpc.Dial()` creates a "channel" (in this case, a network stream channel, not a Go built-in `chan`) which allows us to communicate with a server. Use this to create a channel to `UserService`, which you will use in **A3**. For the server address, use the global `userServiceAddr` which can be set from a configurable flag to your service.
+`grpc.Dial()` creates a "channel" (in this case, a network stream channel, not a Go built-in `chan`) which allows us to communicate with a server. Use this to create a channel to `UserService`, which you will use in **A3**. For the server address, use the `server.options.UserServiceAddr` which can be set from options passed to your service.
 
 Note: for this lab, we are not using TLS, but `grpc.Dial()` does expect transport credentials:
 ```
