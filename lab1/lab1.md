@@ -188,11 +188,13 @@ Since the bulk of the application logic goes into the server_lib of VideoRecServ
  - In `server_test.go`, add unittest skeleton code following the Golang testing tutorials such as [this](https://go.dev/doc/tutorial/add-a-test) and [this](https://pkg.go.dev/testing);
  - In each unittest, spin up a `VideoRecServiceServer` by calling `MakeVideoRecServiceServerWithMocks` with the desired options.
 
-By the end of this lab, you should add at least 5 unit tests. Your tests should have coverage (i.e., at least part of one unit test) on the basic functionality, batching, stats, error handing, retrying, fallback to trending videos. You of course are welcome to add more tests than just 5.
+By the end of this lab, you should add at least 5 unit tests. Your tests should have coverage (i.e., at least part of one unit test) on the basic functionality, batching, stats, error handing, retrying, fallback to trending videos. You of course are welcome to add more tests than just 5. You must include at least some end-to-end tests (i.e., testing `GetTopVideos`), but we encourage you to include unittests of any nontrivial functionality of your `VideoRecService`.
 
 `go test -run='.*' -v` should pass on your implementation as well as our private reference implementation. (**Extra credit** will be given to tests that caught bugs in our reference implementation.)
 
 Note: your actual server **must** be able to communicate with the user|video services via grpc and not solely rely on the mock clients. When we grade the server binary, we will use different undisclosed random seeds for user|video services that your video recommendation server is unaware of; an attempt to use the mock clients to avoid implementing more complex logic such as error handling will be considered cheating.
+
+Note: The failure injection config is shared per-process, i.e., in your unittest, `MockUserServiceClient` and `MockVideoServiceClient` share their failure injection config.
 
 #### A8. Batching
 

@@ -28,9 +28,12 @@ These prompts are also questions for you to think about and not necessarily a ch
 * Contrast DNS and Chubby's unexpected usage as a name server (Section 4.3).
 * Which lessons and discussions surprised you? Why?
 
-### Raft
+### Raft (Sections 6 and 7)
+* Contrast the master failover mechanism in Chubby (Section 2.9) with the Raft leader election and cluster membership change protocol.
 
 ### Paxos
+* Compare single-decree Paxos and Raft: in Raft, which part of the protocol acts as "learners"?
+* How does one ensure the proposal number `n` is unique in Algorithm 12.1?
 
 ### Delos
 * What are some of the ubiquitous examples of virtualization in other areas of computer science or related fields?
