@@ -209,9 +209,6 @@ sys     0m1.406s
 
 The "ok raft 58.142s" means that Go measured the time taken for the 2B tests to be 58.142 seconds of real (wall-clock) time. The "user 0m2.477s" means that the code consumed 2.477 seconds of CPU time, or time spent actually executing instructions (rather than waiting or sleeping). If your solution uses much more than a minute of real time for the **2B** tests, or much more than 5 seconds of CPU time, you may run into trouble later on. Look for time spent sleeping or waiting for RPC timeouts, loops that run without sleeping or waiting for conditions or channel messages, or large numbers of RPCs sent.
 
-
-
-
 ## Part 2C: persistence ([hard](https://pdos.csail.mit.edu/6.824/labs/guidance.html))
 
 If a Raft-based server reboots it should resume service where it left off. This requires that Raft keep persistent state that survives a reboot. The paper's Figure 2 mentions which state should be persistent.
@@ -264,11 +261,13 @@ Kudos for making it all the way through the lab! Reflect on your implementation 
 * A reasonable amount of time to consume for the full set of Lab 2 tests (2A+2B+2C) is 8 minutes of real time and one and a half minutes of CPU time.
 * Both the extended Raft paper and the tester uses 1-indexed log entries, but Golang slices are 0-indexed.
 * Think about how you would "wait for successful reply from a majority" and whether you would need to. You likely shouldn't wait for replies from all nodes since disconnected nodes or delayed RPCs could significally delay the progress.
-* Here is one strategy to manage shared state for your Raft instance. Every member variable should be one of the following three categories:
+* Below is one strategy to manage shared state for your Raft instance. Every member variable should be one of the following categories:
   * (1) once initialized (in `Make()`, read-only and never change), in which case you can access it how/whenever;
   * (2) protected under a mutex (e.g., `rf.mu`);
   * (3) is an [atomic](https://pkg.go.dev/sync/atomic) variable and every access is an atomic access;
   * (4) only ever accessed by a single (perhaps long-running) goroutine, in which case no synchronization is necessary.
+
+  You might find it tempting to minimize contention upfront, however, we strongly recommend you to focus on correctness first, and do the obvious thing first (in this case, (1) and (2)) since "premature optimization is the root of all evil" (Tony Hoare, popularized by Donald Knuth).
 * You might find it helpful to think of mutexes as a way to ensure logic in the critical section is carried out atomically (in addition to ensuring mutual exclusion).
 * Safety vs. liveness. We encourage you to reason about distributed consensus protocols in both their safety guarantees (i.e., bad things do not ever happen) and liveness guarantees (i.e., good things eventually happen [in a reasonable amount of time]). This will be reflected in our grading rubric: we will not give any credit to tests that violate the safety property (e.g., two nodes in the cluster disagree on the value for a committed log entry with the same index, i.e., `apply error`), but we might give partial credit for test failures (especially in **2C** for tests under unreliable networks) due to lack of progress (e.g., `config.one(_): fail to reach agreement`).
 * This [recitation](https://www.cs.princeton.edu/courses/archive/fall16/cos418/docs/P9-raft-assignments.pdf) from the Princeton distributed systems course might be helpful as well. Their Assignment 3 corresponds to Part **2A** and Assignment 4 corresponds to Parts **2B** and **2C**.
