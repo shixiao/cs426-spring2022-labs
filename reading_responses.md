@@ -38,7 +38,15 @@ These prompts are also questions for you to think about and not necessarily a ch
 ### Delos
 * What are some of the ubiquitous examples of virtualization in other areas of computer science or related fields?
 * What's the point of Delos if it still requires a MetaStore using Paxos or Raft? Why not directly use the Paxos- or Raft-based store?
+* Are there scenarios where one would want to break out of the shared log API?
 
-### CopySet
+### Copysets
+* What is the key observation that motivated Copysets?
+* What is the main tradeoff that Copyset makes?
+* Are Copyset choices coupled with / Do they conflict with failure domain awareness? Why or why not?
 
 ### TAO
+
+### FlightTracker
+
+### ShardManager
