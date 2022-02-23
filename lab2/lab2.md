@@ -22,7 +22,7 @@ Your submission for this lab should include the following files:
 raft/raft.go
 raft/my_raft_test.go // create this file and add your own unittests
 raft/my_util.go // [optional] only if you add additional util functions
-discussions.txt
+discussions.md // NOTE: switching from txt to markdown
 time.log
 ```
 
@@ -159,9 +159,9 @@ $ for i in {0..10}; do go test; done
 
 (2) **In practice**, why is this not a major concern? i.e., how does Raft get around this theoretical possibility?
 
-Include your answers under the heading **2A-2** in `discussions.txt`. Reminder: you must cite any sources you consult or any discussions you may have had with your peers or the teaching staff.
+Include your answers under the heading **2A-2** in `discussions.md`. Reminder: you must cite any sources you consult or any discussions you may have had with your peers or the teaching staff.
 
-**ExtraCredit1.** Another issue that affects Raft liveness in the real world (e.g., this [Cloudfare outage](https://blog.cloudflare.com/a-byzantine-failure-in-the-real-world/)---though this is **not** a Byzantine failure.) is related to "term-inflation". Dr. Diego Ongaro described the problem and his idea of addressing this in Section 9.6 of his [thesis](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf); [here](https://www.openlife.cc/sites/default/files/4-modifications-for-Raft-consensus.pdf) is MongoDB's detailed account of the "Pre-Vote" modification they implemented; [this blog post](https://decentralizedthoughts.github.io/2020-12-12-raft-liveness-full-omission/) further describe the ramification and limitations of Pre-Vote and CheckQuorum. Does the scenario you constructed above resolve if the Raft instances implement Pre-Vote and CheckQuorum? If so, could you construct a scenario where Raft leader election can be theoretically stuck even with Pre-Vote and CheckQuorum? If not, explain why not. Include your response under the heading **ExtraCredit1** in `discussions.txt`.
+**ExtraCredit1.** Another issue that affects Raft liveness in the real world (e.g., this [Cloudfare outage](https://blog.cloudflare.com/a-byzantine-failure-in-the-real-world/)---though this is **not** a Byzantine failure.) is related to "term-inflation". Dr. Diego Ongaro described the problem and his idea of addressing this in Section 9.6 of his [thesis](https://web.stanford.edu/~ouster/cgi-bin/papers/OngaroPhD.pdf); [here](https://www.openlife.cc/sites/default/files/4-modifications-for-Raft-consensus.pdf) is MongoDB's detailed account of the "Pre-Vote" modification they implemented; [this blog post](https://decentralizedthoughts.github.io/2020-12-12-raft-liveness-full-omission/) further describe the ramification and limitations of Pre-Vote and CheckQuorum. Does the scenario you constructed above resolve if the Raft instances implement Pre-Vote and CheckQuorum? If so, could you construct a scenario where Raft leader election can be theoretically stuck even with Pre-Vote and CheckQuorum? If not, explain why not. Include your response under the heading **ExtraCredit1** in `discussions.md`.
 
 ### Task 2A-3
 Implement your own unit tests in a new file `my_raft_test.go`. By the end of this lab, you should write at least 5 tests. They could be tests on **2A** leader election, **2B** log replication, or **2C** persistence.
