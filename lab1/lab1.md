@@ -131,7 +131,7 @@ To find the set of videos to rank, you will need to first find the users that th
 With subscribed-to user IDs, make another call to the `UserService` to find *their* `LikedVideos`.
 Be sure to handle errors from `GetUser` correctly, just as you did in **A2** for `Dial`.
 
-**Discussion**: What networking/system calls do you think will be used under the hood when you call `GetUser()`? What cases do you think this call / these calls can return an error? You may find the slides from Lecture 3 helpful. Could `GetUser` return errors in cases where the network calls succeed? Include your responses under a heading **A2** in `discussions.txt`.
+**Discussion**: What networking/system calls do you think will be used under the hood when you call `GetUser()`? What cases do you think this call / these calls can return an error? You may find the slides from Lecture 3 helpful. Could `GetUser` return errors in cases where the network calls succeed? Include your responses under a heading **A3** in `discussions.txt`.
 
 **ExtraCredit1**: How are these errors detected? Include your responses under a heading `ExtraCredit1` in `discussions.txt`.
 
@@ -188,7 +188,7 @@ Since the bulk of the application logic goes into the server_lib of VideoRecServ
  - In `server_test.go`, add unittest skeleton code following the Golang testing tutorials such as [this](https://go.dev/doc/tutorial/add-a-test) and [this](https://pkg.go.dev/testing);
  - In each unittest, spin up a `VideoRecServiceServer` by calling `MakeVideoRecServiceServerWithMocks` with the desired options.
 
-By the end of this lab, you should add at least 5 unit tests. Your tests should have coverage (i.e., at least part of one unit test) on the basic functionality, batching, stats, error handing, retrying, fallback to trending videos. You of course are welcome to add more tests than just 5. You must include at least some end-to-end tests (i.e., testing `GetTopVideos`), but we encourage you to include unittests of any nontrivial functionality of your `VideoRecService`.
+By the end of this lab, you should add at least 5 unit tests. Your tests should have coverage (i.e., at least part of one unit test) on the basic functionality, batching, stats, error handling, retrying, fallback to trending videos. You of course are welcome to add more tests than just 5. You must include at least some end-to-end tests (i.e., testing `GetTopVideos`), but we encourage you to include unittests of any nontrivial functionality of your `VideoRecService`.
 
 `go test -run='.*' -v` should pass on your implementation as well as our private reference implementation. (**Extra credit** will be given to tests that caught bugs in our reference implementation.)
 
@@ -258,7 +258,7 @@ to provide useful responses in degraded scenarios is an important part of a heal
 service.
 
 Start up the set of services as in **A6**, but add the option `--failure-rate 10`
-(1/5 requests fail randomly) to the arguments
+(1 in 10 requests fail randomly) to the arguments
 of the video server (i.e., `go run video_service/server/server.go --failure-rate 10`) and start the stats client to monitor your service.
 
 Run the loadgen client with 10 target QPS (see instructions in **B2**) and see how your service responds when 1 out of 10 requests to `VideoService` fail.
