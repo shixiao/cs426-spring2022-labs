@@ -47,6 +47,19 @@ These prompts are also questions for you to think about and not necessarily a ch
 
 ### TAO
 
-### FlightTracker
+### Weak consistency:
+#### Dynamo (Sections 1, 2, 3.3, 4, 6-6.1, and 6.3)
+* What is Dynamo's strategy for ensuring durability?
+* Can you construct a scenario where the hinted handoff scheme results in an inconsistency?
+* How would you evaluate and measure Dynamo's consistency guarantees?
+* What properties should an application have to leverage Dynamo's read time conflict resolution?
+
+#### Zanzibar (Section 2.2)
+* Why wasn't Spanner (Google's linearizable store) used directly?
+* How does the Zanzibar consistency protocol differ from performing direct reads and writes to Spanner? (Hint: what timestamp choice does Zanzibar have that Spanner has no knowledge of?)
+
+#### FlightTracker (Sections 2 and 3)
+* Compare and contrast FlightTracker Tickets and Zanzibar zookies.
+* How would _you_ design Tickets and the Ticket store?
 
 ### ShardManager
