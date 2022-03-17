@@ -14,3 +14,10 @@ Questions? post to Canvas or email the teaching staff at cs426ta@cs.yale.edu.
    - [Initial version](lab1/lab1.md)
  - Lab 2: Raft with static cluster membership
    - [Initial version](lab2/lab2.md)
+ - Lab 3: Deployment and operations
+   - TBA
+ - Lab 4: Sharded key-value cache
+   - [Preview](lab4_preview.md)
+ - Lab 5: Final project
+   - [Requirements and ideas](https://docs.google.com/document/d/1KAj0vWXFoL4ITRjF9h7PQu8xQiUOdg2P2Gqw0448V7A/edit?usp=sharing)
+   - [Default option](lab5_preview.md)
