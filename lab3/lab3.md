@@ -39,6 +39,8 @@ Your submission for this lab should include the following files:
 
 In addition, as per Part B instructions,
  - Leave a single `LoadgenResult` in your Kubernetes namespace. Delete any others. This run has to have at least one successful request (not 100% errors) to receive credit.
+As per Part C instructions,
+ - Leave your VideoRecService deployment running.
 
 ## Setup
 
@@ -111,8 +113,10 @@ https://docs.docker.com/language/golang/build-images/
 
 For part **A1**, you'll need the steps:
  1. [Creating a Dockerfile](https://docs.docker.com/language/golang/build-images/#create-a-dockerfile-for-the-application)
- 2. [Build the image](https://docs.docker.com/language/golang/build-images/#build-the-image). Don't worry about tagging for now. We will tag your image in **A3**. Note: if you are not on a linux/amd64 platform (e.g., Apple sillicon; or if `uname -m` does not output `x86_64`), you should use docker cross-platform builds by doing `docker buildx build --platform=linux/amd64 ...`.
+ 2. [Build the image](https://docs.docker.com/language/golang/build-images/#build-the-image). Don't worry about tagging for now. We will tag your image in **A3**.
  3. [Multi-stage builds](https://docs.docker.com/language/golang/build-images/#multi-stage-builds). For the deploy stage, please use `alpine:latest` as your base image instead of `gcr.io/distroless/base-debian10` in the instruction; additionally, you do **not** need to switch to `USER nonroot:nonroot`.
+
+Note: if you are not on a linux/amd64 platform (e.g., Apple sillicon; or if `uname -m` does not output `x86_64`), you should use `CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ...` (instead of `go build`) in your Docker file, and use docker cross-platform builds by doing `docker buildx build --platform=linux/amd64 ...`.
 
 For this assignment, you ***must*** structure your `Dockerfile` as a [**multi-stage build**](https://docs.docker.com/language/golang/build-images/#multi-stage-builds) for
 efficiency.
@@ -561,7 +565,8 @@ You may need two counters for your two types of clients to replicate this functi
 for both User and VideoService.
 
 Rebuild and re-push your package to the registry, then run `kubectl rollout restart deploy/video-rec-service` to restart and pickup the changes. Re-run the steps from **C2** to send some load requests to your server and view the
-load distribution among the backends in Grafana.
+load distribution among the backends in Grafana. **Please leave your
+VideoRecService running**
 
 **Discussion**: What does the load distribution look like with a client pool size of 4? What would
 you expect to happen if you used 1 client? How about 8? Note this down under section **C3** in
