@@ -58,5 +58,7 @@ spec:
 "
 
 echo "$kaniko_pod_defn" | kubectl create -f -
-kubectl wait --for=condition=Ready --timeout=100s pod/build-$build_id
-kubectl logs build-$build_id -f
+
+echo "Created pod: build-$build_id"
+echo "Check on it with kubectl get pod build-$build_id"
+echo "Once it is running, you can view logs with kubectl logs -f build-$build_id"
