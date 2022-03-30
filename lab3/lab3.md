@@ -22,7 +22,7 @@ with the cluster or shared tooling please reach out to us via Ed or email.
   - Xiao Shi (xiao.shi@aya.yale.edu)
   - Richard Yang (yry@cs.yale.edu)
 
-**Submission deadline: 23:59 ET Wednesday Apr 6, 2022**
+**Submission deadline: 23:59 ET Saturday Apr 9, 2022**
 
 **Submission logistics**
 Submit a `.tar.gz` archive named after your NetID via
@@ -114,12 +114,42 @@ https://docs.docker.com/language/golang/build-images/
 For part **A1**, you'll need the steps:
  1. [Creating a Dockerfile](https://docs.docker.com/language/golang/build-images/#create-a-dockerfile-for-the-application)
  2. [Build the image](https://docs.docker.com/language/golang/build-images/#build-the-image). Don't worry about tagging for now. We will tag your image in **A3**.
- 3. [Multi-stage builds](https://docs.docker.com/language/golang/build-images/#multi-stage-builds). For the deploy stage, please use `alpine:latest` as your base image instead of `gcr.io/distroless/base-debian10` in the instruction; additionally, you do **not** need to switch to `USER nonroot:nonroot`.
 
-Note: if you are not on a linux/amd64 platform (e.g., Apple sillicon; or if `uname -m` does not output `x86_64`), you should use `CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ...` (instead of `go build`) in your Docker file, and use docker cross-platform builds by doing `docker buildx build --platform=linux/amd64 ...`.
 
-For this assignment, you ***must*** structure your `Dockerfile` as a [**multi-stage build**](https://docs.docker.com/language/golang/build-images/#multi-stage-builds) for
-efficiency.
+#### Extra credit
+
+For this extra credit on this assignment, structure your `Dockerfile` as a multi-stage build for efficiency.
+Follow the instructions for [multi-stage builds](https://docs.docker.com/language/golang/build-images/#multi-stage-builds).
+For the deploy stage, please use `alpine:latest` as your base image instead of `gcr.io/distroless/base-debian10` in the instruction;
+additionally, you do **not** need to switch to `USER nonroot:nonroot`.
+
+
+#### Build instructions (ARM, Apple M1 / Apple Silicon)
+
+The remote cluster is running on x86_64 machines, which presents challenges if you are not building for the right architecture.
+This is easiest if you have an x86_64 machine (easiest on Linux), but
+if you are not on a linux/amd64 platform (e.g., Apple sillicon; or if `uname -m` does not output `x86_64`), you should use `CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ...` (instead of `go build`) in your Docker file, and use docker cross-platform builds by doing `docker buildx build --platform=linux/amd64 ...`.
+
+#### Remote Build instructions
+We recommend having Docker installed locally because it will make the build process and turn-around time much quicker.
+If you do not have this option, we provide a remote build service that runs in the cluster. Note that this will be
+slower than running locally.
+
+The remote build script can be invoked on a Unix machine that has `kubectl`, `curl`, and `tar` installed (such as Zoo).
+The builder can be invoked from the `build.sh` script in this repository. You must run it from the
+directory that has your Dockerfile. You can copy the script to your lab1 working directory,
+or run something like
+
+```
+NETID=your-net-id PASSWORD=your-registry-password ../lab3/build.sh registry.cs426.cloud/<NETID>/<image-name>:latest Dockerfile go.mod go.sum other/files/you/want
+```
+
+You must explicitly list all the files or directories (e.g. `video_rec_service/`) that you want for the build because it must upload
+the build context to the cluster.
+
+This will build the image in the cluster and submit it to the registry automatically.
+We will provide minimal debugging support if you have issues with the remote build, please post on Canvas. The remote builder
+may not support the full Docker feature set, but should be enough to get a standard single stage build running.
 
 ### A2. Testing your image
 
