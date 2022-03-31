@@ -363,7 +363,8 @@ of the shardmap, the client may be misconfigured, or the request was simply raci
 
 To start with this safety feature, you'll first need a sharding function. We recommend defining a function
 like `GetShardForKey(key string, numShards int) int` in `utils.go` that you can re-use across client
-and server implementation. You can use any hash function you want as long as it distributes well across
+and server implementation. We have provided a basic implementation that you can use if you want, but you can use 
+any hash function you want as long as it distributes well across
 the number of shards. (Recall from the [ShardMap background](#shardmap-handling-dynamic-sharding) section above that `NumShards` is a constant.)
 
 Next, on all requests to your server, compute the shard for the key in the request. If the server
@@ -562,7 +563,7 @@ Semantics:
 ### Discussion
 
 What are the ramifications of partial failures on `Set` calls? What
-anamolies could a client observe?
+anomalies could a client observe?
 
 Note your answer down under heading **B4** in `discussions.md`.
 
