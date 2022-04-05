@@ -93,6 +93,15 @@ order, but you are free to work on them in any order you see fit.
     * Additionally, you will need to install the Go plugins, following these steps: https://grpc.io/docs/languages/go/quickstart/
  3. This lab will be using Go, as with others. You will primarily be running tests in the `kv/test/` directory with `go test` (or `go test -v -run=TestClient` like in lab 0 and lab 1). You will not need extra tools like `kubectl` or `docker`.
 
+## Use of Go libraries
+
+You will likely not need any additional external libraries other than the ones
+already in use (gRPC, logrus, testify, etc). If you wish to use one, please
+post on Ed. We will not accept libraries which make substantial parts of
+the assignment trivial (for example, no pre-made thread-safe caches).
+
+If using an approved library, add it to your `go.mod` as usual, which you will
+submit as part of the assignment.
 
 # Background
 ## KV: The Key-Value API
@@ -222,6 +231,35 @@ hook in the test harness for testing clients and servers separately. When testin
 we use `TestClientPool` which removes networking overhead and allows us to inject
 responses and failures to aid in unit testing. You may use `TestClientPool` when
 implementing your own unit tests as well.
+
+## Logging with levels
+
+We've imported a leveled logging implementation ([Logrus](https://github.com/sirupsen/logrus))
+and used it in this project. It provides levels instead of just a single Printf/Print
+function, which can help filter severity of events. For example, you can log
+very bad things with `logrus.Errorf()` to be output at the ERROR level, or
+very unimportant things with `logrus.Debugf()` to be output at the DEBUG level.
+
+You can use the `-log-level=debug` flag to set the minimum log level for the messages
+to be output. By default this is `INFO` -- so only `logrus.Info()` or higher (meaning info, warn, error, or fatal/panic)
+are output.
+
+When writing your code you can sprinkle in `Debug()` or even `Trace()` (lowest level)
+statements which are not output by default, but can be turned on when you want
+to debug a test. For example, if a test fails you may run something like
+
+```
+go test -run=TestServerXyz -v -log-level=trace
+```
+
+You are free to use `logrus` with the existing flags or use the
+standard library `log` package (or just write to stderr directly if you really want to).
+We recommend adding log statements for edge cases as you go along to aid in debugging,
+but they are not required. Read more about Logrus (including structured logging
+with fields) in the [official docs](https://github.com/sirupsen/logrus).
+
+If using `logrus`, we also provide a flag `-log-file=path/to/file` which outputs
+to a file instead of `stderr`, for easier retrieval later.
 
 # Part A. Server implementation
 
