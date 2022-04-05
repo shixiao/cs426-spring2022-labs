@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"strconv"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"cs426.yale.edu/lab4/kv"
+	"cs426.yale.edu/lab4/logging"
 )
 
 // Simple CLI for interacting with a KV cluster. You can get, set, or delete values using the Kv API.
@@ -23,11 +25,13 @@ var (
 )
 
 func usage() {
-	log.Fatal("Usage: client.go [get|set|delete] key [value] [ttl]")
+	logrus.Fatal("Usage: client.go [get|set|delete] key [value] [ttl]")
 }
 
 func main() {
 	flag.Parse()
+	logging.InitLogging()
+
 	args := flag.Args()
 	if len(args) < 2 {
 		usage()
@@ -35,7 +39,7 @@ func main() {
 
 	fileSm, err := kv.WatchShardMapFile(*shardMapFile)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	clientPool := kv.MakeClientPool(&fileSm.ShardMap)
@@ -50,9 +54,9 @@ func main() {
 	case "get":
 		value, isSet, err := client.Get(ctx, key)
 		if err != nil {
-			log.Printf("error getting value for key: %q", err)
+			logrus.WithField("key", key).Errorf("error getting value for key: %q", err)
 		} else if !isSet {
-			log.Printf("no value set for key: %s", key)
+			logrus.WithField("key", key).Info("no value set for key")
 		} else {
 			println(value)
 		}
@@ -63,16 +67,16 @@ func main() {
 		value := args[2]
 		ttlMs, err := strconv.ParseInt(args[3], 10, 64)
 		if err != nil {
-			log.Fatalf("expected int value for ttlMs: %q", err)
+			logrus.Fatalf("expected int value for ttlMs: %q", err)
 		}
 		err = client.Set(ctx, key, value, time.Duration(ttlMs)*time.Millisecond)
 		if err != nil {
-			log.Printf("error setting value for key: %q", err)
+			logrus.WithField("key", key).Errorf("error setting value: %q", err)
 		}
 	case "delete":
 		err := client.Delete(ctx, key)
 		if err != nil {
-			log.Printf("error deleting value for key: %q", err)
+			logrus.WithField("key", key).Errorf("error deleting value for key: %q", err)
 		}
 	default:
 		usage()

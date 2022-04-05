@@ -2,12 +2,13 @@ package kvtest
 
 import (
 	"fmt"
-	"log"
 	"runtime"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"cs426.yale.edu/lab4/kv"
 	"github.com/stretchr/testify/assert"
@@ -475,7 +476,7 @@ func TestServerTtlDataActuallyCleanedUp(t *testing.T) {
 	// Note that this doesn't necessarily mean immediately deleting from the map once TTL
 	// has expired, but you must do so in a relatively timely fashion (a few seconds).
 	//
-	// We send 1024 keys with values of size 100KB each (total 100MB), make sure they
+	// We send 100 keys with values of size 1MB each (total 100MB), make sure they
 	// exist, then wait for the TTL and check that the server memory usage declines.
 	//
 	// We send some dummy requests in case your server only deletes items on-demand
@@ -486,15 +487,17 @@ func TestServerTtlDataActuallyCleanedUp(t *testing.T) {
 	// Given the large amount of data in this test, we are relatively lenient with times.
 	// For the 100MB of data we give a 10s TTL, and it must be mostly cleaned up by 20s.
 	//
-	// Expect this test to run for 20s or more (but less than 45s).
+	// Expect this test to run for 20s or more (but less than a minute).
 	setup := MakeTestSetup(MakeMultiShardSingleNode())
 	var baselineMemory runtime.MemStats
 	runtime.ReadMemStats(&baselineMemory)
-	log.Printf("baseline memory usage: %dMB", baselineMemory.Alloc/1024/1024)
+	logrus.Debugf("baseline memory usage: %dMB", baselineMemory.Alloc/1024/1024)
 
-	keys := RandomKeys(1024, 10)
-	for _, k := range keys {
-		val := RandomKeys(1, 100*1024)[0]
+	keys := RandomKeys(100, 10)
+	vals := RandomKeys(100, 1024*1024)
+	logrus.Debugf("created random data")
+	for i, k := range keys {
+		val := vals[i]
 		err := setup.NodeSet("n1", k, val, 10*time.Second)
 		assert.Nil(t, err)
 	}
@@ -509,7 +512,7 @@ func TestServerTtlDataActuallyCleanedUp(t *testing.T) {
 	var startingMemory runtime.MemStats
 	runtime.ReadMemStats(&startingMemory)
 	assert.Greater(t, startingMemory.Alloc, uint64(100*1024*1024))
-	log.Printf(
+	logrus.Debugf(
 		"memory usage after setting 100MB worth of data: %dMB",
 		startingMemory.Alloc/1024/1024,
 	)
@@ -529,7 +532,7 @@ func TestServerTtlDataActuallyCleanedUp(t *testing.T) {
 	var endingMemory runtime.MemStats
 	runtime.ReadMemStats(&endingMemory)
 	memoryDiff := startingMemory.Alloc - endingMemory.Alloc
-	log.Printf("memory after waiting out TTL: %dMB", endingMemory.Alloc/1024/1024)
+	logrus.Debugf("memory after waiting out TTL: %dMB", endingMemory.Alloc/1024/1024)
 	assert.Greater(t, startingMemory.Alloc, endingMemory.Alloc)
 	// Expect a difference of at least 80MB -- cleaning up at least 80% of the 100MB set
 	assert.Less(t, uint64(80*1024*1024), memoryDiff)

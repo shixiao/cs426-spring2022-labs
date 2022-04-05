@@ -3,6 +3,8 @@ package kv
 import (
 	"sync"
 	"sync/atomic"
+
+	"github.com/sirupsen/logrus"
 )
 
 type NodeInfo struct {
@@ -75,7 +77,7 @@ type ShardMap struct {
 /*
  * Gets a pointer to the latest internal state via a thread-safe atomic load.
  */
-func (sm *ShardMap) getState() *ShardMapState {
+func (sm *ShardMap) GetState() *ShardMapState {
 	state := sm.state.Load().(*ShardMapState)
 	return state
 }
@@ -85,7 +87,7 @@ func (sm *ShardMap) getState() *ShardMapState {
  * To access a single node, use Nodes()[nodeName].
  */
 func (sm *ShardMap) Nodes() map[string]NodeInfo {
-	return sm.getState().Nodes
+	return sm.GetState().Nodes
 }
 
 /*
@@ -95,14 +97,14 @@ func (sm *ShardMap) Nodes() map[string]NodeInfo {
  * You may assume that NumShards() does not ever change.
  */
 func (sm *ShardMap) NumShards() int {
-	return sm.getState().NumShards
+	return sm.GetState().NumShards
 }
 
 /*
  * Gets the set of integer shards assigned to a given node (by node name).
  */
 func (sm *ShardMap) ShardsForNode(nodeName string) []int {
-	state := sm.getState()
+	state := sm.GetState()
 	shards := make([]int, 0)
 	for shard, nodes := range state.ShardsToNodes {
 		for _, node := range nodes {
@@ -120,7 +122,7 @@ func (sm *ShardMap) ShardsForNode(nodeName string) []int {
  * as a key to query the Nodes() map.
  */
 func (sm *ShardMap) NodesForShard(shard int) []string {
-	state := sm.getState()
+	state := sm.GetState()
 	nodeNames, ok := state.ShardsToNodes[shard]
 
 	if !ok {
@@ -163,6 +165,8 @@ func (sm *ShardMap) MakeListener() ShardMapListener {
  * listeners receive the notification.
  */
 func (sm *ShardMap) Update(state *ShardMapState) {
+	logrus.Trace("updating shardmap state")
+
 	sm.state.Swap(state)
 	sm.mutex.RLock()
 	defer sm.mutex.RUnlock()

@@ -2,8 +2,9 @@ package kv
 
 import (
 	"fmt"
-	"log"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 
 	"cs426.yale.edu/lab4/kv/proto"
 	"google.golang.org/grpc"
@@ -44,9 +45,8 @@ type ClientPool interface {
 type GrpcClientPool struct {
 	shardMap *ShardMap
 
-	mutex    sync.RWMutex
-	clients  map[string]proto.KvClient
-	shutdown chan struct{}
+	mutex   sync.RWMutex
+	clients map[string]proto.KvClient
 }
 
 func MakeClientPool(shardMap *ShardMap) GrpcClientPool {
@@ -74,7 +74,7 @@ func (pool *GrpcClientPool) GetClient(nodeName string) (proto.KvClient, error) {
 
 	nodeInfo, ok := pool.shardMap.Nodes()[nodeName]
 	if !ok {
-		log.Printf("unknown nodename passed to GetClient: %s", nodeName)
+		logrus.WithField("node", nodeName).Errorf("unknown nodename passed to GetClient")
 		return nil, fmt.Errorf("no node named: %s", nodeName)
 	}
 
@@ -82,7 +82,7 @@ func (pool *GrpcClientPool) GetClient(nodeName string) (proto.KvClient, error) {
 	address := fmt.Sprintf("%s:%d", nodeInfo.Address, nodeInfo.Port)
 	client, err := makeConnection(address)
 	if err != nil {
-		log.Printf("failed to connect to node %s (%s): %q", nodeName, address, err)
+		logrus.WithField("node", nodeName).Debugf("failed to connect to node %s (%s): %q", nodeName, address, err)
 		return nil, err
 	}
 	pool.clients[nodeName] = client

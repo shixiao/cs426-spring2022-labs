@@ -3,11 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net"
+
+	"github.com/sirupsen/logrus"
 
 	"cs426.yale.edu/lab4/kv"
 	"cs426.yale.edu/lab4/kv/proto"
+	"cs426.yale.edu/lab4/logging"
 	"google.golang.org/grpc"
 )
 
@@ -27,26 +29,28 @@ var (
 
 func main() {
 	flag.Parse()
+	logging.InitLogging()
+
 	if len(*shardMapFile) == 0 || len(*nodeName) == 0 {
-		log.Fatal("--shardmap and --node are required")
+		logrus.Fatal("--shardmap and --node are required")
 	}
 
 	server := grpc.NewServer()
 	fileSm, err := kv.WatchShardMapFile(*shardMapFile)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
-	log.Printf("loaded shardmap: %q", fileSm.ShardMap.Nodes())
+	logrus.Infof("loaded shardmap: %q", fileSm.ShardMap.Nodes())
 
 	nodeInfo, ok := fileSm.ShardMap.Nodes()[*nodeName]
 	if !ok {
-		log.Fatalf("node not found in shard map: %s", *nodeName)
+		logrus.Fatalf("node not found in shard map: %s", *nodeName)
 	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", nodeInfo.Port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logrus.Fatalf("failed to listen: %v", err)
 	}
 
 	clientPool := kv.MakeClientPool(&fileSm.ShardMap)
@@ -55,8 +59,8 @@ func main() {
 		server,
 		kv.MakeKvServer(*nodeName, &fileSm.ShardMap, &clientPool),
 	)
-	log.Printf("server listening at %v", lis.Addr())
+	logrus.Infof("server listening at %v", lis.Addr())
 	if err := server.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		logrus.Fatalf("failed to serve: %v", err)
 	}
 }

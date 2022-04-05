@@ -2,8 +2,9 @@ package kv
 
 import (
 	"encoding/json"
-	"log"
 	"os"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -44,12 +45,12 @@ type FileShardMap struct {
 func WatchShardMapFile(filename string) (*FileShardMap, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Printf("could created a file watcher for %s: %q", filename, err)
+		logrus.Errorf("could created a file watcher for %s: %q", filename, err)
 		return nil, err
 	}
 	err = watcher.Add(filename)
 	if err != nil {
-		log.Printf("could not watch file %s: %q", filename, err)
+		logrus.Errorf("could not watch file %s: %q", filename, err)
 		return nil, err
 	}
 
@@ -74,24 +75,24 @@ func (fileSm *FileShardMap) watchForUpdates() {
 		select {
 		case event, ok := <-fileSm.watcher.Events:
 			if !ok {
-				log.Printf("done watching shardmap file: %s", fileSm.filename)
+				logrus.Debugf("done watching shardmap file: %s", fileSm.filename)
 				break
 			}
 			if isBitSet(event.Op, fsnotify.Write) {
-				log.Printf("shard map updated from %s", fileSm.filename)
+				logrus.Debugf("shard map updated from %s", fileSm.filename)
 				err := fileSm.applyFromFile()
 				if err != nil {
-					log.Print("failed to apply shardmap update -- using old shardmap value")
+					logrus.Warnf("failed to apply shardmap update -- using old shardmap value")
 				}
 			}
 		case err, ok := <-fileSm.watcher.Events:
 			if !ok {
-				log.Printf("done after error watching shardmap file: %s", fileSm.filename)
+				logrus.Errorf("done after error watching shardmap file: %s", fileSm.filename)
 				break
 			}
-			log.Printf("error while watching shardmap file %s: %q", fileSm.filename, err)
+			logrus.Warnf("error while watching shardmap file %s: %q", fileSm.filename, err)
 		case <-fileSm.done:
-			break
+			return
 		}
 	}
 }
@@ -99,14 +100,14 @@ func (fileSm *FileShardMap) watchForUpdates() {
 func (fileSm *FileShardMap) applyFromFile() error {
 	data, err := os.ReadFile(fileSm.filename)
 	if err != nil {
-		log.Printf("failed to read shardmap file %s: %q", fileSm.filename, err)
+		logrus.Errorf("failed to read shardmap file %s: %q", fileSm.filename, err)
 		return err
 	}
 
 	var smState ShardMapState
 	err = json.Unmarshal(data, &smState)
 	if err != nil {
-		log.Printf("failed to unmarshall shardmap file %s: %q", fileSm.filename, err)
+		logrus.Errorf("failed to unmarshall shardmap file %s: %q", fileSm.filename, err)
 		return err
 	}
 
