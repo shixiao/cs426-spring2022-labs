@@ -97,3 +97,25 @@ func TestSetupShardMapComputation(t *testing.T) {
 	// n4 does not host shard 3, hence should error
 	checkDropReplicas(t, &smState, 3, 1, []string{"n4"}, true)
 }
+
+func TestShardMapStateGeneration(t *testing.T) {
+	assert.True(t, MakeBasicOneShard().IsValid())
+	assert.True(t, MakeMultiShardSingleNode().IsValid())
+	assert.True(t, MakeNoShardAssigned().IsValid())
+	assert.True(t, MakeSingleNodeHalfShardsAssigned().IsValid())
+	assert.True(t, MakeTwoNodeBothAssignedSingleShard().IsValid())
+	assert.True(t, MakeTwoNodeMultiShard().IsValid())
+	assert.True(t, MakeFourNodesWithFiveShards().IsValid())
+
+	assert.True(t, MakeManyNodesWithManyShards(0, 0).IsValid())
+	assert.True(t, MakeManyNodesWithManyShards(0, 4).IsValid())
+	assert.True(t, MakeManyNodesWithManyShards(3, 0).IsValid())
+	assert.True(t, MakeManyNodesWithManyShards(4, 5).IsValid())
+	assert.True(t, MakeManyNodesWithManyShards(4, 1).IsValid())
+	assert.True(t, MakeManyNodesWithManyShards(20, 7).IsValid())
+	assert.True(t, MakeManyNodesWithManyShards(20, 20).IsValid())
+	for i := 0; i < 100; i++ {
+		assert.True(t, MakeManyNodesWithManyShards(100, 4).IsValid())
+		assert.True(t, MakeManyNodesWithManyShards(1000, 700).IsValid())
+	}
+}

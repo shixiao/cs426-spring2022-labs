@@ -532,24 +532,33 @@ func MakeManyNodesWithManyShards(numShards int, numNodes int) kv.ShardMapState {
 		nodeNames = append(nodeNames, fmt.Sprintf("n%d", i))
 	}
 	for shard := 1; shard <= numShards; shard++ {
-		// pick r unique nodes
-		minR := 2
 		maxR := 5
-		r := rand.Intn(maxR-minR) + minR
+		if maxR > numNodes {
+			maxR = numNodes
+		}
+		minR := 2
+		if minR > maxR {
+			minR = maxR
+		}
+		// random number in [minR, maxR] (rand.Intn uses half-open interval)
+		r := rand.Intn(maxR-minR+1) + minR
 
+		// pick r unique nodes
 		replicas := make(map[string]struct{}, 0)
 		nodes := make([]string, 0)
-		for {
+		for len(replicas) < r {
 			idx := rand.Intn(numNodes)
 			node := nodeNames[idx]
 			if node == "" {
 				panic(fmt.Sprintf("%v %v %v", nodeNames, idx, node))
 			}
+			// if already picked, skip
+			_, present := replicas[node]
+			if present {
+				continue
+			}
 			replicas[node] = struct{}{}
 			nodes = append(nodes, node)
-			if len(replicas) >= r {
-				break
-			}
 		}
 		shardsToNodes[shard] = nodes
 	}
