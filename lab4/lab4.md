@@ -203,7 +203,7 @@ implement a shard migration protocol in **Part C** to handle this without losing
 Your client implementation (`Kv` in `client.go`) will use this shard map to find which server to route to.
 For example, given a `Get("abc")` request, you will
  1. Compute the shard (by hashing `"abc"`)
- 2. Look up which nodes host that shard (by name), e.g. if "abc" maps to shard 3, this would be "n1" and "n2"
+ 2. Look up which nodes host that shard (by name), e.g. if "abc" maps to shard 3, this would be "n2" and "n3"
  3. Use the existing `ClientPool` to map the nodeName to a `KvClient` (which uses the address / port given)
  4. Use the `KvClient` to send a request to the server
 
