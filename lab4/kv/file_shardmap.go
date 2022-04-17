@@ -3,6 +3,7 @@ package kv
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 
 	"github.com/sirupsen/logrus"
 
@@ -48,7 +49,7 @@ func WatchShardMapFile(filename string) (*FileShardMap, error) {
 		logrus.Errorf("could created a file watcher for %s: %q", filename, err)
 		return nil, err
 	}
-	err = watcher.Add(filename)
+	err = watcher.Add(filepath.Dir(filename))
 	if err != nil {
 		logrus.Errorf("could not watch file %s: %q", filename, err)
 		return nil, err
@@ -78,19 +79,24 @@ func (fileSm *FileShardMap) watchForUpdates() {
 				logrus.Debugf("done watching shardmap file: %s", fileSm.filename)
 				break
 			}
-			if isBitSet(event.Op, fsnotify.Write) {
-				logrus.Debugf("shard map updated from %s", fileSm.filename)
+			if event.Name != fileSm.filename {
+				logrus.Tracef("ignoring update event for file: %s", event.Name)
+				continue
+			}
+
+			if isBitSet(event.Op, fsnotify.Write) || isBitSet(event.Op, fsnotify.Create) {
+				logrus.Debugf("shard map updated from %s (%s)", event.Name, event.Op.String())
 				err := fileSm.applyFromFile()
 				if err != nil {
 					logrus.Warnf("failed to apply shardmap update -- using old shardmap value")
 				}
 			}
-		case err, ok := <-fileSm.watcher.Events:
+		case err, ok := <-fileSm.watcher.Errors:
 			if !ok {
 				logrus.Errorf("done after error watching shardmap file: %s", fileSm.filename)
 				break
 			}
-			logrus.Warnf("error while watching shardmap file %s: %q", fileSm.filename, err)
+			logrus.Warnf("error while watching shardmap directory %s: %q", fileSm.filename, err)
 		case <-fileSm.done:
 			return
 		}
