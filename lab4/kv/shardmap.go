@@ -31,6 +31,36 @@ type ShardMapState struct {
 }
 
 /*
+ * Whether a ShardMapState is valid.
+ */
+func (smState ShardMapState) IsValid() bool {
+	if len(smState.ShardsToNodes) > smState.NumShards {
+		return false
+	}
+	for shard, nodes := range smState.ShardsToNodes {
+		// shard must be 1..NumShards
+		if shard < 1 || shard > smState.NumShards {
+			return false
+		}
+		nodeSet := make(map[string]struct{})
+		for _, node := range nodes {
+			// node must be exist
+			_, present := smState.Nodes[node]
+			if !present {
+				return false
+			}
+			// cannot have duplicate nodes for a shard
+			_, present = nodeSet[node]
+			if present {
+				return false
+			}
+			nodeSet[node] = struct{}{}
+		}
+	}
+	return true
+}
+
+/*
  * Dynamically configurable ShardMap -- contains Nodes in the cluster
  * and a map of which shards are assigned to which node.
  *
