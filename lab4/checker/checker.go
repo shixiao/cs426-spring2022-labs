@@ -42,6 +42,7 @@ import (
 // it via these flags.
 var checkCorrectness = flag.Bool("check", true, "If set to false, don't check correctness of values")
 var checkTtl = flag.Bool("check-ttl", true, "If set to false, don't for expired TTLs")
+var ttlCheckBuffer = flag.Duration("ttl-check-buffer", 10*time.Millisecond, "Buffer time to allow for implementation differences in TTL")
 
 /*
  * Value recorded from a potential Set() call. We record the value
@@ -134,7 +135,7 @@ func (cc *ConsistencyChecker) CompleteWrite(
 	newVal := stateValue{
 		value:               value,
 		maybeExpiredBy:      maybeExpiredBy,
-		definitelyExpiredBy: definitelyExpiredBy,
+		definitelyExpiredBy: definitelyExpiredBy.Add(*ttlCheckBuffer),
 		writtenAt:           time.Now(),
 		err:                 err,
 	}
@@ -175,7 +176,7 @@ func (cc *ConsistencyChecker) BeginRead(key string) (int, bool) {
 	return cc.version[key], cc.rc[key] != 0
 }
 
-func (cc *ConsistencyChecker) CheckReadCorrect(key, value string, wasFound bool, initialVersion int, writesPending bool) error {
+func (cc *ConsistencyChecker) CheckReadCorrect(key, value string, wasFound bool, startTime time.Time, initialVersion int, writesPending bool) error {
 	if !*checkCorrectness {
 		return nil
 	}
@@ -214,8 +215,9 @@ func (cc *ConsistencyChecker) CheckReadCorrect(key, value string, wasFound bool,
 				return fmt.Errorf("incorrect value %s; never written to key", val)
 			}
 		}
-		if *checkTtl && val.err == nil && val.definitelyExpiredBy.Before(time.Now()) {
-			return fmt.Errorf("value %s was written, but expired at least %dms ago", value, time.Since(val.definitelyExpiredBy).Milliseconds())
+		if *checkTtl && val.err == nil && val.definitelyExpiredBy.Before(startTime) {
+			timeDiff := startTime.Sub(val.maybeExpiredBy)
+			return fmt.Errorf("value %s was written, but expired at least %dms ago", value, timeDiff.Milliseconds())
 		}
 	}
 	return nil

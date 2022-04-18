@@ -159,7 +159,7 @@ func (st *stressTester) stressGets() {
 			atomic.AddUint64(&st.getErrs, 1)
 
 		} else {
-			err := st.cc.CheckReadCorrect(key, val, wasFound, initialVersion, writesPending)
+			err := st.cc.CheckReadCorrect(key, val, wasFound, startTime, initialVersion, writesPending)
 			if err != nil && st.errorLogLimiter.Allow() {
 				atomic.AddUint64(&st.inconsistencies, 1)
 				logrus.WithField("key", key).Errorf("get returned wrong answer: %s", err)
