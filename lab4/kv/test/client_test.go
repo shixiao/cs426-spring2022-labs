@@ -327,9 +327,9 @@ func TestClientMultiNodeMultiShard(t *testing.T) {
 		assert.Nil(t, err)
 		assert.True(t, wasFound)
 		if keysToNodes[key] == "n1" {
-			assert.Equal(t, val, "from n1")
+			assert.Equal(t, "from n1", val)
 		} else {
-			assert.Equal(t, val, "from n2")
+			assert.Equal(t, "from n2", val)
 		}
 	}
 }
@@ -382,9 +382,9 @@ func TestClientMultiNodeMultiShardSwap(t *testing.T) {
 		assert.True(t, wasFound)
 		// If it was originally written to n1, it should be routed to n2 now after shard swap
 		if keysToOriginalNodes[key] == "n1" {
-			assert.Equal(t, val, "from n2")
+			assert.Equal(t, "from n2", val)
 		} else {
-			assert.Equal(t, val, "from n1")
+			assert.Equal(t, "from n1", val)
 		}
 	}
 }
@@ -412,7 +412,7 @@ func TestClientConcurrentGetSet(t *testing.T) {
 					val, wasFound, err := setup.Get(key)
 					assert.Nil(t, err)
 					assert.True(t, wasFound)
-					assert.Equal(t, val, val)
+					assert.Equal(t, "val", val)
 
 					err = setup.Set(key, "val", 1*time.Second)
 					assert.Nil(t, err)

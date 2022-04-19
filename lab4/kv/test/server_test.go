@@ -686,7 +686,7 @@ func TestServerSingleShardMoveWithCopy(t *testing.T) {
 	val, wasFound, err := setup.NodeGet("n2", "abc")
 	assert.Nil(t, err)
 	assert.True(t, wasFound)
-	assert.Equal(t, val, "123")
+	assert.Equal(t, "123", val)
 
 	setup.Shutdown()
 }
@@ -767,7 +767,7 @@ func TestServerMultiShardMoveWithCopy(t *testing.T) {
 		val, wasFound, err := setup.NodeGet(newNode, key)
 		assert.Nil(t, err)
 		assert.True(t, wasFound)
-		assert.Equal(t, val, "123")
+		assert.Equal(t, "123", val)
 	}
 
 	setup.Shutdown()

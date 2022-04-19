@@ -183,14 +183,14 @@ func TestIntegrationRemoveNode(t *testing.T) {
 	assert.Nil(t, err)
 	// since there isn't a shard that is only on n4, we expect all the keys are still present.
 	cntRes := countKeysFound(t, setup, keys, vals)
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 	assert.Equal(t, 0, len(cntRes.errorMap))
 
 	err = setup.RemoveNode("n1")
 	assert.Nil(t, err)
 	// n1 and n4 is not a copy set, so we don't expect data loss
 	cntRes = countKeysFound(t, setup, keys, vals)
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 	assert.Equal(t, 0, len(cntRes.errorMap))
 
 	// if we drain too many nodes, we lose some data
@@ -214,14 +214,14 @@ func TestIntegrationDrainNode(t *testing.T) {
 	err := setup.DrainNode("n4")
 	assert.Nil(t, err)
 	cntRes := countKeysFound(t, setup, keys, vals)
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 	assert.Equal(t, 0, len(cntRes.errorMap))
 
 	err = setup.DrainNode("n1")
 	assert.Nil(t, err)
 	// n1 and n4 is not a copy set, so we don't expect data loss
 	cntRes = countKeysFound(t, setup, keys, vals)
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 	assert.Equal(t, 0, len(cntRes.errorMap))
 
 	// n2 is still up and should now host all the shards, so we still don't
@@ -229,7 +229,7 @@ func TestIntegrationDrainNode(t *testing.T) {
 	err = setup.DrainNode("n3")
 	assert.Nil(t, err)
 	cntRes = countKeysFound(t, setup, keys, vals)
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 	assert.Equal(t, 0, len(cntRes.errorMap))
 
 	setup.Shutdown()
@@ -258,11 +258,11 @@ func TestIntegrationGracefulShardMovementBasic(t *testing.T) {
 
 	// now n3 should have all 5 shards
 	cntRes = countKeysFoundOnNode(t, setup, keys, vals, "n3")
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 
 	// accessing all keys through the cluster should also work
 	cntRes = countKeysFound(t, setup, keys, vals)
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 
 	setup.Shutdown()
 }
@@ -284,7 +284,7 @@ func TestIntegrationGracefulShardMovementConsecutiveSingleShardMoves(t *testing.
 
 	// After many single shard movements, all keys should still be present
 	cntRes := countKeysFound(t, setup, keys, vals)
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 }
 
 // Moving multiple shards / moving multiple replicas for a shard at once
@@ -321,10 +321,10 @@ func TestIntegrationGracefulMultiShardMovement(t *testing.T) {
 
 	// now n3 should have all 5 shards
 	cntRes = countKeysFoundOnNode(t, setup, keys, vals, "n3")
-	assert.Equal(t, cntRes.numKeysFound, numKeys)
+	assert.Equal(t, numKeys, cntRes.numKeysFound)
 	// n4 should have zero data
 	cntRes = countKeysFoundOnNode(t, setup, keys, vals, "n4")
-	assert.Equal(t, cntRes.numKeysFound, 0)
+	assert.Equal(t, 0, cntRes.numKeysFound)
 
 	setup.Shutdown()
 }
