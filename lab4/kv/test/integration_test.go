@@ -391,6 +391,7 @@ func TestIntegrationFull(t *testing.T) {
 	assert.Less(t, cntRes.numKeysFound, numKeys)
 
 	assert.Equal(t, 0, len(cntRes.errorMap))
+	setup.Shutdown()
 }
 
 func TestMain(m *testing.M) {
